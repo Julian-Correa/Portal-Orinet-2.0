@@ -1,8 +1,8 @@
 [build]
   base = "ISP-Portal"
   command = "npm run build"
-  publish = "ISP-Portal/dist"
-  functions = "ISP-Portal/netlify/functions"
+  publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   VITE_PORTAL_API_BASE = "/api"
