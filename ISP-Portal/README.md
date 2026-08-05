@@ -1,6 +1,9 @@
-# Portal de Clientes - OriNet
+# Portal de Clientes - OriNet 2.0
 
-Portal web para que clientes de OriNet consulten su cuenta por DNI, vean deuda, factura, plan, datos de pago y actualicen el email de facturacion.
+Segunda version del portal web de OriNet. Repositorio dedicado para la evolucion del producto con mejoras de arquitectura, UX y funcionalidad.
+
+Repo anterior (v1): desarrollo original donde se construyo el portal desde cero.
+Repo actual (v2): https://github.com/Julian-Correa/Portal-Orinet-2.0
 
 ## Stack
 
@@ -10,7 +13,7 @@ Portal web para que clientes de OriNet consulten su cuenta por DNI, vean deuda, 
 - Redis opcional, con fallback en memoria
 - Integracion con ISPCube
 
-## Funcionalidades
+## Funcionalidades actuales (heredadas de v1)
 
 - Consulta por DNI de 7 u 8 digitos
 - Resumen agregado con cliente, ultima factura y plan
@@ -19,15 +22,23 @@ Portal web para que clientes de OriNet consulten su cuenta por DNI, vean deuda, 
 - Contacto directo por WhatsApp
 - UI responsive para login y perfil
 
+## Roadmap 2.0
+
+El roadmap detallado esta en `todo.md`. Las lineas principales son:
+
+1. **Refactor del frontend** - Extraer `App.jsx` en componentes y hooks modulares
+2. **Mejora de UX** - Nuevo diseno visual, mejor feedback de estados y errores
+3. **Nuevas funcionalidades** - Features adicionales segun necesidad del negocio
+4. **Observabilidad** - Mejor logging y monitoreo de errores del proveedor
+5. **Infraestructura** - Evaluar rate limit distribuido y optimizaciones de cache
+
 ## Scripts
 
-```bash
-npm run dev
-npm run server
-npm run lint
-npm test
-npm run build
-```
+    npm run dev       # frontend Vite
+    npm run server    # backend Express local
+    npm run lint      # linting ESLint
+    npm test          # tests con Vitest
+    npm run build     # build de produccion
 
 ## Desarrollo local
 
@@ -43,25 +54,23 @@ npm run build
 
 Variables principales del backend:
 
-```bash
-PORT=8787
-CORS_ORIGIN=http://localhost:5173
-REDIS_URL=redis://localhost:6379
-CACHE_TTL_SECONDS=120
-TOKEN_TTL_SECONDS=600
-REQUEST_TIMEOUT_MS=12000
-BODY_LIMIT=25kb
-RATE_LIMIT_WINDOW_MS=60000
-RATE_LIMIT_MAX=30
-RECARGO_RECONEXION=2000
-RECARGO_SEGUNDO_VENCIMIENTO=2000
-CUT_DAY=26
-ISP_API_BASE=https://online25.ispcube.com/api
-ISP_API_KEY=
-ISP_CLIENT_ID=302
-ISP_API_USER=
-ISP_API_PASS=
-```
+    PORT=8787
+    CORS_ORIGIN=http://localhost:5173
+    REDIS_URL=redis://localhost:6379
+    CACHE_TTL_SECONDS=120
+    TOKEN_TTL_SECONDS=600
+    REQUEST_TIMEOUT_MS=12000
+    BODY_LIMIT=25kb
+    RATE_LIMIT_WINDOW_MS=60000
+    RATE_LIMIT_MAX=30
+    RECARGO_RECONEXION=2000
+    RECARGO_SEGUNDO_VENCIMIENTO=2000
+    CUT_DAY=26
+    ISP_API_BASE=https://online25.ispcube.com/api
+    ISP_API_KEY=
+    ISP_CLIENT_ID=302
+    ISP_API_USER=
+    ISP_API_PASS=
 
 `VITE_PORTAL_API_BASE` se usa solo en frontend. En Netlify queda seteada como `/api` desde `netlify.toml`.
 
@@ -79,20 +88,19 @@ El PUT de email valida `Origin` contra `CORS_ORIGIN`. Los errores del proveedor 
 
 ## Arquitectura
 
-```text
-src/
-  components/
-  lib/
-server/
-  app/          # composicion compartida de runtime
-  config/       # entorno y validaciones
-  http/         # handler HTTP canonico
-  lib/          # cache Redis/memoria
-  repositories/ # acceso a ISPCube
-  services/     # reglas de negocio
-netlify/functions/
-  api.js        # entrypoint serverless fino
-```
+    src/
+      components/
+      lib/
+    server/
+      app/          # composicion compartida de runtime
+      config/       # entorno y validaciones
+      http/         # handler HTTP canonico
+      lib/          # cache Redis/memoria
+      repositories/ # acceso a ISPCube
+      services/     # reglas de negocio
+    netlify/functions/
+      api.js        # entrypoint serverless fino
+    ia/             # documentacion tecnica para continuidad
 
 Flujo actual:
 
@@ -110,14 +118,30 @@ Flujo actual:
 
 ## Deploy en Netlify
 
-`netlify.toml` ya deja configurado:
+El repo tiene un `netlify.toml` en la raiz que configura:
 
+- `base`: `ISP-Portal`
 - build: `npm run build`
 - publish: `dist`
 - functions: `netlify/functions`
 - redirect: `/api/*` -> `/.netlify/functions/api/:splat`
 
 En Netlify no subas `.env`. Carga las variables en la configuracion del sitio.
+
+## Documentacion tecnica
+
+La carpeta `ia/` contiene documentacion detallada del proyecto para continuidad:
+
+- `projectmemory.md` - memoria operativa del proyecto
+- `architecture.md` - arquitectura del sistema
+- `api.md` - contratos de API
+- `components.md` - componentes frontend y backend
+- `business-rules.md` - reglas de negocio
+- `data-model.md` - modelo de datos
+- `infrastructure.md` - stack e infra
+- `user-flows.md` - flujos de usuario
+- `decision.md` - decisiones tecnicas vigentes
+- `changelog.md` - historial de cambios
 
 ## Notas
 

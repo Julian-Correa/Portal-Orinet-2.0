@@ -1,6 +1,14 @@
 ## Objetivo
 
-Esta carpeta documenta el estado tecnico actual de `OriNet` para que cualquier IA o desarrollador pueda continuar el proyecto con contexto operativo y arquitectonico.
+Esta carpeta documenta el estado tecnico actual del Portal OriNet 2.0 para que cualquier IA o desarrollador pueda continuar el proyecto con contexto operativo y arquitectonico.
+
+## Contexto del proyecto
+
+- Portal OriNet 2.0 - segunda version del portal de clientes.
+- Repo: https://github.com/Julian-Correa/Portal-Orinet-2.0
+- El proyecto vive dentro de `ISP-Portal/` en el repo.
+- La v1 fue estabilizada con todas las mejoras de seguridad y calidad completadas.
+- La v2 parte de esa base estable para evolucionar el producto.
 
 ## Como usar esta carpeta
 
@@ -20,19 +28,20 @@ Esta carpeta documenta el estado tecnico actual de `OriNet` para que cualquier I
 
 ## Fuentes de verdad actuales
 
-- Frontend: `src/App.jsx`, `src/main.jsx`
+- Frontend: `src/App.jsx`, `src/main.jsx`, `src/components/`
 - Backend local: `server/index.js`
 - Backend serverless: `netlify/functions/api.js`
-- Capas backend: `server/controllers`, `server/services`, `server/repositories`, `server/lib`, `server/config`
-- Configuracion: `package.json`, `netlify.toml`, `.env.example`
+- Capas backend: `server/http`, `server/app`, `server/services`, `server/repositories`, `server/lib`, `server/config`
+- Configuracion: `package.json`, `netlify.toml` (raiz y dentro de ISP-Portal), `.env.example`
 - Contexto funcional: `README.md`
+- Roadmap: `todo.md`
 
 ## Limites conocidos
 
 - No hay base de datos propia en el repo.
-- No hay suite automatizada de tests.
-- El frontend esta concentrado casi por completo en `src/App.jsx`.
 - La integracion principal depende de ISPCube como proveedor externo.
+- El frontend esta parcialmente modularizado pero `App.jsx` sigue siendo el archivo central.
+- El acceso es por DNI sin autenticacion fuerte (decision de negocio vigente).
 
 ## Archivos incluidos
 

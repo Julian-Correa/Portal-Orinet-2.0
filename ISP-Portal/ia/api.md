@@ -8,7 +8,6 @@
 
 #### Respuesta exitosa `200`
 
-```json
 {
   "customer": {
     "id": 123,
@@ -29,9 +28,11 @@
     "plan": "Plan 100 MB",
     "price": "$ 0,00"
   },
+  "recargoReconexion": 2000,
+  "recargoSegundoVencimiento": 2000,
+  "cutDay": 26,
   "generatedAt": "2026-07-21T00:00:00.000Z"
 }
-```
 
 #### Errores esperados
 
@@ -49,27 +50,24 @@
 
 #### Body
 
-```json
 {
   "email": "cliente@dominio.com"
 }
-```
 
 #### Reglas
 
 - El email se normaliza con `trim().toLowerCase()`.
 - Si el proveedor acepta el cambio, se invalida la cache de resumen por DNI.
+- Se valida `Origin` contra `CORS_ORIGIN`.
 
 #### Respuesta exitosa `200`
 
-```json
 {
   "customer": {
     "id": 123,
     "contact_emails": [{ "id": 1, "email": "cliente@dominio.com", "principal": 1 }]
   }
 }
-```
 
 #### Errores esperados
 
@@ -82,14 +80,12 @@
 
 #### Respuesta
 
-```json
 {
   "ok": true,
   "redis": false
 }
-```
 
-## Endpoints externos usados
+## Endpoints externos usados (ISPCube)
 
 - `POST /sanctum/token`
 - `GET /customer?doc_number={dni}&deleted=false&temporary=false`
@@ -103,3 +99,4 @@
 - El frontend depende de que el backend siempre responda JSON.
 - `invoiceUrl` es opcional.
 - `planInfo` puede devolverse como `No informado` si la integracion no encuentra datos.
+- Los errores del proveedor se loguean internamente y no se exponen al cliente.

@@ -37,6 +37,9 @@ El backend agrega esta estructura para el frontend:
 - `invoiceUrl`
 - `planInfo.plan`
 - `planInfo.price`
+- `recargoReconexion`
+- `recargoSegundoVencimiento`
+- `cutDay`
 - `generatedAt`
 
 ### Connection
@@ -67,3 +70,8 @@ Dato auxiliar del proveedor. Se usan sobre todo:
 - No existe historico propio ni auditoria dentro del repo.
 - Cualquier cambio estructural fuerte en los datos debe pensarse en funcion del contrato de ISPCube.
 - Si en el futuro se agrega una base propia, este documento debe evolucionar de modelo derivado a modelo persistente.
+
+## Notas 2.0
+
+- El summary payload ahora incluye `recargoReconexion`, `recargoSegundoVencimiento` y `cutDay` (agregados en v1 final).
+- Si se agregan nuevas funcionalidades que requieran persistencia propia, documentar el modelo aqui.

@@ -12,6 +12,7 @@
 1. El usuario entra al perfil.
 2. Ve deuda total, deuda vencida, estado de servicio, plan y medios de pago.
 3. Si hay `invoiceUrl`, puede abrir la ultima factura en PDF.
+4. Recargos (reconexion, segundo vencimiento) se calculan con valores del backend.
 
 ## Flujo 3: copiar datos de pago
 
@@ -42,3 +43,8 @@
 
 1. Si `POPUP_CONFIG.enabled` es `true`, se muestra un modal con imagen.
 2. Se puede cerrar con click fuera, boton `x` o `Escape`.
+
+## Notas 2.0
+
+- Estos flujos representan el estado actual heredado de v1.
+- A medida que se agreguen funcionalidades en 2.0, documentar nuevos flujos aqui.

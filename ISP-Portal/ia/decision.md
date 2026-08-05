@@ -20,9 +20,10 @@
 
 ### D-004 - Mantener una SPA sin router
 
-- Estado: vigente
+- Estado: vigente (candidata a revision en 2.0)
 - Motivo: el producto actual tiene un flujo unico y acotado.
 - Consecuencia: `src/App.jsx` quedo muy concentrado y es el principal candidato a refactor futuro.
+- Nota 2.0: si se agregan nuevas pantallas o flujos, evaluar incorporar un router.
 
 ### D-005 - Reusar service/repository entre Express y Netlify
 
@@ -53,6 +54,20 @@
 - Estado: vigente
 - Motivo: permitir cambiar recargos y dia de corte sin redeploy del frontend.
 - Consecuencia: `customer-summary` ahora expone `recargoReconexion`, `recargoSegundoVencimiento` y `cutDay`.
+
+### D-010 - Repo dedicado para Portal 2.0
+
+- Estado: vigente
+- Fecha: 2026-08-05
+- Motivo: separar la evolucion del portal 2.0 del repositorio original para tener un historial limpio y facilitar el desarrollo iterativo sin afectar la version en produccion estable.
+- Consecuencia: el repo v1 queda como referencia historica. Todo el desarrollo nuevo ocurre en https://github.com/Julian-Correa/Portal-Orinet-2.0.
+
+### D-011 - Deploy con base directory en Netlify
+
+- Estado: vigente
+- Fecha: 2026-08-05
+- Motivo: el proyecto vive dentro de `ISP-Portal/` en el repo, no en la raiz. Netlify necesita un `netlify.toml` en la raiz con `base = "ISP-Portal"` para encontrar el codigo.
+- Consecuencia: los paths de `publish` y `functions` en `netlify.toml` son relativos a la base, no a la raiz del repo.
 
 ## Regla de actualizacion
 

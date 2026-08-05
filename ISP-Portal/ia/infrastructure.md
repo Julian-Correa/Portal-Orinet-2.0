@@ -1,10 +1,17 @@
 ## Stack tecnico
 
-- Frontend: React 19 + Vite 8 beta
+- Frontend: React 19 + Vite 8
 - Backend local: Node.js + Express 5
 - Backend deploy: Netlify Functions
 - Cache: Redis opcional, fallback en memoria
 - Integracion externa: ISPCube API
+
+## Repositorio y estructura
+
+- Repo: https://github.com/Julian-Correa/Portal-Orinet-2.0
+- El proyecto vive dentro de `ISP-Portal/` en el repo.
+- `netlify.toml` en la raiz del repo con `base = "ISP-Portal"`.
+- `netlify.toml` dentro de `ISP-Portal/` con la configuracion detallada de build.
 
 ## Scripts disponibles
 
@@ -13,6 +20,7 @@
 - `npm run lint`: linting ESLint
 - `npm run preview`: preview del build
 - `npm run server`: backend Express local
+- `npm test`: tests con Vitest
 
 ## Variables de entorno relevantes
 
@@ -23,7 +31,7 @@
 ### Backend
 
 - `PORT`
-- `CORS_ORIGIN`
+- `CORS_ORIGIN` (obligatorio, el server no arranca sin ella)
 - `REDIS_URL`
 - `CACHE_TTL_SECONDS`
 - `TOKEN_TTL_SECONDS`
@@ -31,17 +39,23 @@
 - `BODY_LIMIT`
 - `RATE_LIMIT_WINDOW_MS`
 - `RATE_LIMIT_MAX`
+- `RECARGO_RECONEXION`
+- `RECARGO_SEGUNDO_VENCIMIENTO`
+- `CUT_DAY`
 - `ISP_API_BASE`
-- `ISP_API_KEY`
+- `ISP_API_KEY` (obligatorio para que funcione la API)
 - `ISP_CLIENT_ID`
-- `ISP_API_USER`
-- `ISP_API_PASS`
+- `ISP_API_USER` (obligatorio para que funcione la API)
+- `ISP_API_PASS` (obligatorio para que funcione la API)
 
 ## Deploy actual
 
-- `netlify.toml` define build, publish dir y functions dir.
+- Plataforma: Netlify
+- `netlify.toml` (raiz) define `base = "ISP-Portal"`.
+- Dentro de `ISP-Portal/`, `netlify.toml` define build, publish dir y functions dir.
 - `dist/` contiene el artefacto generado del frontend.
 - `/api/*` redirige a `/.netlify/functions/api/:splat`.
+- Variables de entorno se configuran en el dashboard de Netlify, nunca en el repo.
 
 ## Seguridad actual
 
@@ -49,10 +63,12 @@
 - Se desactiva `x-powered-by` en Express.
 - Se agregan headers basicos: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`.
 - Hay rate limit en memoria sobre endpoints sensibles.
+- `CORS_ORIGIN` es obligatorio, no hay fallback a `*`.
+- El PUT de email valida `Origin` explicitamente.
 
 ## Limitaciones operativas
 
-- El rate limit en memoria no es global.
+- El rate limit en memoria no es global entre instancias.
 - El cache en memoria de Netlify depende de instancias warm y no es persistente.
 - Sin Redis, el rendimiento y la reutilizacion de token/resumen dependen del proceso actual.
 

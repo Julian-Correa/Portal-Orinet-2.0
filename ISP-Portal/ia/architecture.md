@@ -1,22 +1,26 @@
 ## Resumen
 
-`OriNet` es un portal de clientes para un ISP. El sistema tiene tres piezas principales:
+`OriNet 2.0` es un portal de clientes para un ISP. El sistema tiene tres piezas principales:
 
 1. Un frontend SPA en React/Vite.
 2. Un backend proxy para proteger credenciales y simplificar llamadas al proveedor.
 3. Una integracion externa con ISPCube, con cache opcional en Redis y fallback en memoria.
 
+## Repositorio
+
+- Repo: https://github.com/Julian-Correa/Portal-Orinet-2.0
+- El proyecto vive dentro de `ISP-Portal/` en el repo.
+- El `netlify.toml` en la raiz del repo configura `base = "ISP-Portal"` para que Netlify encuentre el codigo.
+
 ## Vista de alto nivel
 
-```text
-Cliente web
-  -> React SPA (`src/App.jsx`)
-  -> API agregada (`/customer-summary`, `/customers/:dni/email`, `/health`)
-  -> Service layer (`CustomerSummaryService`)
-  -> Repository layer (`IspRepository`)
-  -> ISPCube API
-  -> Cache Redis o memoria
-```
+    Cliente web
+      -> React SPA (`src/App.jsx`)
+      -> API agregada (`/customer-summary`, `/customers/:dni/email`, `/health`)
+      -> Service layer (`CustomerSummaryService`)
+      -> Repository layer (`IspRepository`)
+      -> ISPCube API
+      -> Cache Redis o memoria
 
 ## Modos de ejecucion
 
@@ -38,6 +42,8 @@ Cliente web
 
 - `src/main.jsx`: bootstrap React.
 - `src/App.jsx`: login, perfil, popup, manejo de errores, llamadas HTTP y rendering completo.
+- `src/components/`: componentes extraidos (ErrorBoundary, PopupImage, icons, layout, screens, profile).
+- `src/lib/`: utilidades, API client y configuracion.
 
 ### Backend local
 
@@ -84,6 +90,13 @@ Cliente web
 ## Restricciones arquitectonicas actuales
 
 - No existe autenticacion real ni sesion persistida; el acceso se basa solo en DNI.
-- La UI no tiene router, store global ni separacion fuerte por componentes.
+- La UI no tiene router, store global ni separacion fuerte por componentes (principal candidato a refactor 2.0).
 - El rate limit es en memoria, por proceso/instancia.
 - La arquitectura depende del contrato de ISPCube y puede romperse si el proveedor cambia respuestas.
+
+## Direccion arquitectonica 2.0
+
+- Extraer `App.jsx` en componentes y hooks modulares.
+- Evaluar incorporar router si se agregan nuevas pantallas.
+- Mejorar observabilidad de errores del proveedor.
+- Evaluar rate limit distribuido si el trafico crece.
