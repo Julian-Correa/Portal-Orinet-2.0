@@ -129,51 +129,51 @@ export default function AdminDashboard({ session }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Métricas */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center">
-            <span className="text-2xl mr-2">📊</span> Métricas de Uso
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <span className="text-2xl mr-3 bg-blue-500/20 p-2 rounded-lg">📊</span> Métricas de Uso
           </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <p className="text-sm text-blue-600 font-semibold uppercase tracking-wide">Visitas Totales</p>
-              <p className="text-3xl font-bold text-blue-900 mt-1">{metrics.visits}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-black/20 border border-white/5 rounded-xl p-5 text-center transition-transform hover:scale-[1.02]">
+              <p className="text-sm text-sky-400 font-bold uppercase tracking-wider mb-2">Visitas Totales</p>
+              <p className="text-4xl font-extrabold text-white">{metrics.visits}</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <p className="text-sm text-green-600 font-semibold uppercase tracking-wide">Comprobantes</p>
-              <p className="text-3xl font-bold text-green-900 mt-1">{metrics.comprobanteClicks}</p>
+            <div className="bg-black/20 border border-white/5 rounded-xl p-5 text-center transition-transform hover:scale-[1.02]">
+              <p className="text-sm text-[#10b981] font-bold uppercase tracking-wider mb-2">Comprobantes</p>
+              <p className="text-4xl font-extrabold text-white">{metrics.comprobanteClicks}</p>
             </div>
           </div>
         </div>
 
         {/* Costos Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center">
-            <span className="text-2xl mr-2">💰</span> Reglas y Costos
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <span className="text-2xl mr-3 bg-emerald-500/20 p-2 rounded-lg">💰</span> Reglas y Costos
           </h2>
-          <form onSubmit={handleSaveCostos} className="space-y-4">
+          <form onSubmit={handleSaveCostos} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Recargo por reconexión ($)</label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Recargo por reconexión ($)</label>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
                 value={costos.recargoReconexion}
                 onChange={e => setCostos({...costos, recargoReconexion: Number(e.target.value)})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Costo de compromiso de pago ($)</label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Costo de compromiso de pago ($)</label>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
                 value={costos.costoCompromiso}
                 onChange={e => setCostos({...costos, costoCompromiso: Number(e.target.value)})}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Umbral max. deuda vencida ($)</label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Umbral max. deuda vencida ($)</label>
               <input 
                 type="number" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
                 value={costos.umbralDeudaVencida}
                 onChange={e => setCostos({...costos, umbralDeudaVencida: Number(e.target.value)})}
               />
@@ -181,7 +181,7 @@ export default function AdminDashboard({ session }) {
             <button 
               type="submit" 
               disabled={savingCostos}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              className="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg min-h-[44px] flex justify-center items-center"
             >
               {savingCostos ? "Guardando..." : "Guardar Costos"}
             </button>
@@ -191,30 +191,30 @@ export default function AdminDashboard({ session }) {
 
       <div className="grid grid-cols-1 gap-6 mb-8">
         {/* Popup Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center">
-            <span className="text-2xl mr-2">🖼️</span> Popup Comercial
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <span className="text-2xl mr-3 bg-purple-500/20 p-2 rounded-lg">🖼️</span> Popup Comercial
           </h2>
-          <form onSubmit={handleSavePopup} className="space-y-4">
-            <div className="flex items-center mb-4">
+          <form onSubmit={handleSavePopup} className="space-y-5">
+            <div className="flex items-center mb-6 p-4 bg-black/20 rounded-xl border border-white/5">
               <input 
                 type="checkbox" 
                 id="popupEnabled"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 text-purple-500 bg-black/50 border-white/20 rounded focus:ring-purple-500 focus:ring-offset-0 min-h-[44px] min-w-[44px]"
                 checked={popup.enabled}
                 onChange={e => setPopup({...popup, enabled: e.target.checked})}
               />
-              <label htmlFor="popupEnabled" className="ml-2 block text-sm font-medium text-gray-700">
+              <label htmlFor="popupEnabled" className="ml-3 block text-base font-medium text-white cursor-pointer">
                 Habilitar popup publicitario en el inicio
               </label>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">URL de la Imagen</label>
                 <input 
                   type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
                   value={popup.imageUrl}
                   placeholder="https://ejemplo.com/imagen.jpg"
                   onChange={e => setPopup({...popup, imageUrl: e.target.value})}
@@ -222,10 +222,10 @@ export default function AdminDashboard({ session }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Enlace al hacer click (opcional)</label>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">Enlace al hacer click (opcional)</label>
                 <input 
                   type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
                   value={popup.linkUrl}
                   placeholder="https://ejemplo.com/promo"
                   onChange={e => setPopup({...popup, linkUrl: e.target.value})}
@@ -237,7 +237,7 @@ export default function AdminDashboard({ session }) {
             <button 
               type="submit" 
               disabled={savingPopup}
-              className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg min-h-[44px]"
             >
               {savingPopup ? "Guardando..." : "Guardar Popup"}
             </button>
@@ -245,71 +245,74 @@ export default function AdminDashboard({ session }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-gray-700 flex items-center">
-            <span className="text-2xl mr-2">📋</span> Catálogo de Planes
+      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 className="text-xl font-bold text-white flex items-center">
+            <span className="text-2xl mr-3 bg-orange-500/20 p-2 rounded-lg">📋</span> Catálogo de Planes
           </h2>
           <button 
             onClick={handleAddPlan}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-1.5 px-3 rounded-md text-sm transition-colors"
+            className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold py-2.5 px-5 rounded-xl text-sm transition-all min-h-[44px]"
           >
             + Agregar Plan
           </button>
         </div>
         
         {planes.length === 0 ? (
-          <p className="text-gray-500 italic mb-4">No hay planes cargados en el catálogo comercial.</p>
+          <div className="bg-black/20 border border-white/5 p-8 rounded-xl text-center">
+            <p className="text-slate-400 italic">No hay planes cargados en el catálogo comercial.</p>
+          </div>
         ) : (
-          <div className="space-y-4 mb-4">
+          <div className="space-y-4 mb-6">
             {planes.map((plan, index) => (
-              <div key={plan.id} className="p-4 border border-gray-200 rounded-lg relative">
+              <div key={plan.id} className="p-5 bg-black/20 border border-white/10 rounded-xl relative transition-all focus-within:ring-2 focus-within:ring-sky-500/50">
                 <button 
                   onClick={() => handleRemovePlan(plan.id)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 font-bold px-2 py-1"
+                  className="absolute top-3 right-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg p-2 font-bold min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
                   title="Eliminar plan"
+                  aria-label="Eliminar plan"
                 >
                   &times;
                 </button>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pr-12 md:pr-8">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase">Nombre</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Nombre</label>
                     <input 
                       type="text" 
                       value={plan.nombre}
                       onChange={(e) => handlePlanChange(plan.id, 'nombre', e.target.value)}
                       placeholder="Ej: Plan Fibra 100"
-                      className="w-full mt-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase">Velocidad</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Velocidad</label>
                     <input 
                       type="text" 
                       value={plan.velocidad}
                       onChange={(e) => handlePlanChange(plan.id, 'velocidad', e.target.value)}
                       placeholder="Ej: 100 Mbps"
-                      className="w-full mt-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 uppercase">Precio</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Precio</label>
                     <input 
                       type="text" 
                       value={plan.precio}
                       onChange={(e) => handlePlanChange(plan.id, 'precio', e.target.value)}
                       placeholder="Ej: $ 15.000"
-                      className="w-full mt-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
                     />
                   </div>
                   <div className="md:col-span-3">
-                    <label className="block text-xs font-medium text-gray-500 uppercase">Descripción breve</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Descripción breve</label>
                     <input 
                       type="text" 
                       value={plan.descripcion}
                       onChange={(e) => handlePlanChange(plan.id, 'descripcion', e.target.value)}
                       placeholder="Ej: Ideal para familias, Netflix y juegos."
-                      className="w-full mt-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -321,7 +324,7 @@ export default function AdminDashboard({ session }) {
         <button 
           onClick={handleSavePlanes}
           disabled={savingPlanes}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg min-h-[44px]"
         >
           {savingPlanes ? "Guardando..." : "Guardar Catálogo de Planes"}
         </button>
