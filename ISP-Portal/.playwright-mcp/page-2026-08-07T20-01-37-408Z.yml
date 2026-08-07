@@ -1,0 +1,59 @@
+- generic [ref=e23]:
+  - navigation [ref=e24]:
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]: OriNet
+        - link "Dashboard" [ref=e30] [cursor=pointer]:
+          - /url: /admin
+      - button "Cerrar sesión" [ref=e32]
+  - main [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Panel de Administración" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Configuración general y métricas del portal
+      - generic [ref=e38]:
+        - text: Error al cargar los datos del panel.
+        - button "×" [ref=e39]
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - heading "📊 Métricas de Uso" [level=2] [ref=e42]
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - paragraph [ref=e45]: Visitas Totales
+              - paragraph [ref=e46]: "0"
+            - generic [ref=e47]:
+              - paragraph [ref=e48]: Comprobantes
+              - paragraph [ref=e49]: "0"
+        - generic [ref=e50]:
+          - heading "💰 Reglas y Costos" [level=2] [ref=e51]
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - text: Recargo por reconexión ($)
+              - spinbutton [ref=e54]: "0"
+            - generic [ref=e55]:
+              - text: Costo de compromiso de pago ($)
+              - spinbutton [ref=e56]: "0"
+            - generic [ref=e57]:
+              - text: Umbral max. deuda vencida ($)
+              - spinbutton [ref=e58]: "0"
+            - button "Guardar Costos" [ref=e59]
+      - generic [ref=e61]:
+        - heading "🖼️ Popup Comercial" [level=2] [ref=e62]
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - checkbox "Habilitar popup publicitario en el inicio" [ref=e65]
+            - text: Habilitar popup publicitario en el inicio
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - text: URL de la Imagen
+              - textbox "https://ejemplo.com/imagen.jpg" [disabled] [ref=e68]
+            - generic [ref=e69]:
+              - text: Enlace al hacer click (opcional)
+              - textbox "https://ejemplo.com/promo" [disabled] [ref=e70]
+          - button "Guardar Popup" [ref=e71]
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - heading "📋 Catálogo de Planes" [level=2] [ref=e74]
+          - button "+ Agregar Plan" [ref=e75]
+        - paragraph [ref=e77]: No hay planes cargados en el catálogo comercial.
+        - button "Guardar Catálogo de Planes" [ref=e78]

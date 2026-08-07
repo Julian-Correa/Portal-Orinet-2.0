@@ -22,9 +22,11 @@
 
 ## 2026-08-07
 
-### Fases 1 a 7 (Portal v2.0 - Core, Router y Admin)
+### Fases 1 a 7 y Base de Fase 8 (Portal v2.0)
 
+- Se solucionó la compatibilidad con Tailwind CSS v4 instalando `@tailwindcss/postcss` y ajustando `postcss.config.js` y `index.css`.
 - Se introdujo `react-router-dom` y se refactorizó `App.jsx` para soportar múltiples vistas con un `MainLayout` y `Navbar`.
+- Se implementó la lógica matemática de fechas en `src/lib/utils/compromisos.js` (Fase 8) asegurando mediante pruebas unitarias en Vitest que la ventana de compromisos cumpla las reglas estrictas de negocio (no fechas pasadas, excepciones días 26/27 para suspendidos).
 - Se extrajo el estado global y de sesión en el custom hook `useCustomerSession` persistiendo en `sessionStorage`.
 - Se integró una capa de persistencia mediante `@netlify/blobs` (y un fallback local por archivos) para guardar la configuración (Costos, Popup) y métricas de uso.
 - Se agregaron endpoints administrativos a la capa HTTP en `/admin/*` autorizados a través del código `ADMIN_ACCESS_CODE`.

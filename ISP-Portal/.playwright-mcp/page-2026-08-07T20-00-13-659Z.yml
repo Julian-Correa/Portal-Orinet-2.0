@@ -1,0 +1,17 @@
+- generic [ref=e4]:
+  - img [ref=e7]:
+    - generic [ref=e8]: OriNet
+    - generic [ref=e9]: Tu Servicio de Internet
+  - generic [ref=e11]:
+    - generic [ref=e12]: DNI (sin puntos ni espacios)
+    - 'textbox "Ej: 26281212" [ref=e13]'
+    - button "Ingresar →" [disabled] [ref=e14]
+  - generic [ref=e15]:
+    - paragraph [ref=e16]: ¿Problemas para ingresar?
+    - link "Contactar por WhatsApp" [ref=e17] [cursor=pointer]:
+      - /url: https://wa.me/541130921454?text=Hola%20OriNet%2C%20necesito%20ayuda%20para%20acceder%20al%20portal%20de%20clientes.
+    - paragraph [ref=e21]:
+      - text: Desarrollado por
+      - link "Correa Julián" [ref=e22] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/correa-julian/
+      - text: .

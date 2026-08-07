@@ -24,7 +24,7 @@ function log(level, event, details = {}) {
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": env.corsOrigin,
-    "Access-Control-Allow-Headers": "Content-Type, Accept",
+    "Access-Control-Allow-Headers": "Content-Type, Accept, x-admin-code",
     "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
     "Content-Type": "application/json",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
