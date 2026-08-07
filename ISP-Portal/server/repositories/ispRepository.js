@@ -173,6 +173,31 @@ export class IspRepository {
     return null;
   }
 
+  async getPlanes(token) {
+    const plansCacheKey = "isp:plans:list";
+    const cachedPlans = await this.cache.get(plansCacheKey);
+    if (Array.isArray(cachedPlans)) {
+      return cachedPlans;
+    }
+
+    try {
+      const response = await this.request(`${this.isp.apiBase}/plans/plans_list`, {
+        headers: this.headers(token),
+      });
+
+      if (!response.ok) return [];
+
+      const data = await this.readJson(response, "plans/plans_list");
+      const plans = Array.isArray(data) ? data : [];
+      await this.cache.set(plansCacheKey, plans, this.tokenTtlSeconds);
+
+      return plans;
+    } catch (error) {
+      this.warn("isp_optional_plans_failed", { message: error.message });
+      return [];
+    }
+  }
+
   async findPlanById(planId, token) {
     if (!planId) return null;
 

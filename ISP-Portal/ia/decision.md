@@ -20,10 +20,10 @@
 
 ### D-004 - Mantener una SPA sin router
 
-- Estado: vigente (candidata a revision en 2.0)
+- Estado: reemplazada por D-013
 - Motivo: el producto actual tiene un flujo unico y acotado.
 - Consecuencia: `src/App.jsx` quedo muy concentrado y es el principal candidato a refactor futuro.
-- Nota 2.0: si se agregan nuevas pantallas o flujos, evaluar incorporar un router.
+- Nota 2.0: reemplazada por D-013 debido a la incorporación de múltiples pantallas.
 
 ### D-005 - Reusar service/repository entre Express y Netlify
 
@@ -68,6 +68,41 @@
 - Fecha: 2026-08-05
 - Motivo: el proyecto vive dentro de `ISP-Portal/` en el repo, no en la raiz. Netlify necesita un `netlify.toml` en la raiz con `base = "ISP-Portal"` para encontrar el codigo.
 - Consecuencia: los paths de `publish` y `functions` en `netlify.toml` son relativos a la base, no a la raiz del repo.
+
+### D-012 - Netlify Blobs para persistencia de configuracion y metricas
+
+- Estado: vigente
+- Fecha: 2026-08-07
+- Motivo: la config dinámica (costos, planes) y métricas deben sobrevivir cold starts. Como en desarrollo se usa `npm run dev` y no `netlify dev`, se necesita un adapter local (JSON file).
+- Consecuencia: el proyecto pasa a tener capa de persistencia real administrable.
+
+### D-013 - Enrutador frontend (React Router)
+
+- Estado: vigente
+- Fecha: 2026-08-07
+- Motivo: la v2.0 necesita navegación por secciones (perfil, planes, compromisos).
+- Consecuencia: reemplaza a D-004. Requiere reestructuración de `App.jsx`.
+
+### D-014 - Acceso de administrador por codigo en entorno
+
+- Estado: vigente
+- Fecha: 2026-08-07
+- Motivo: simplicidad operativa, un único administrador, sin gestión de usuarios ni tokens.
+- Consecuencia: código en variable de entorno.
+
+### D-015 - Persistencia de sesion (SessionStorage)
+
+- Estado: vigente
+- Fecha: 2026-08-07
+- Motivo: evitar que el cliente o admin pierda la sesión (vuelva al login) si recarga la página por error, dada la nueva estructura de navegación múltiple.
+- Consecuencia: uso de `sessionStorage` para guardar estado del login temporalmente.
+
+### D-016 - Restricciones de ventana de compromisos de pago
+
+- Estado: vigente
+- Fecha: 2026-08-07
+- Motivo: estricto control comercial sobre cuándo se pueden pedir compromisos.
+- Consecuencia: fechas pasadas inhabilitadas. Mensaje fijo de WhatsApp de soporte para suspendidos.
 
 ## Regla de actualizacion
 

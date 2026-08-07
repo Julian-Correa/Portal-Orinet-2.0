@@ -1,6 +1,8 @@
 import { getCustomerSummaryService, getHealthStatus } from "../app/runtime.js";
 import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
+import { configRepository } from "../repositories/configRepository.js";
+import { metricsRepository } from "../repositories/metricsRepository.js";
 
 const rateLimitBuckets = new Map();
 
@@ -146,6 +148,13 @@ function validateOrigin(event, headers) {
   return json(403, { error: "origen no permitido" }, headers);
 }
 
+function validateAdmin(event, headers) {
+  const adminCode = getHeader(event.headers, "x-admin-code");
+  if (adminCode === env.adminAccessCode) return null;
+
+  return json(401, { error: "no autorizado" }, headers);
+}
+
 function isTimeoutError(error) {
   return error?.message?.startsWith("Timeout consultando ISPCube");
 }
@@ -189,6 +198,11 @@ export function createApiHandler({
         const dni = event.queryStringParameters?.dni;
         const cleanDni = String(dni || "").replace(/\D/g, "");
 
+        // Validar acceso de administrador
+        if (cleanDni === env.adminAccessCode) {
+          return json(200, { isAdmin: true }, headers);
+        }
+
         if (cleanDni.length < 7 || cleanDni.length > 8) {
           return json(400, { error: "dni invalido" }, headers);
         }
@@ -207,11 +221,65 @@ export function createApiHandler({
           });
           return json(result.status, { error: result.error }, headers);
         }
+        
+        // Registrar visita si la petición es exitosa
+        await metricsRepository.incrementVisits().catch(e => log("error", "api_metrics_error", { message: e.message }));
 
         return json(result.status, result.data, {
           ...headers,
           "x-cache": result.cacheStatus,
         });
+      }
+
+      if (routePath === "/planes" && method === "GET") {
+        return json(200, await configRepository.getPlanes(), headers);
+      }
+
+      // --- ENDPOINTS ADMINISTRATIVOS (Config) ---
+      if (routePath.startsWith("/admin/config/")) {
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+
+        const subRoute = routePath.replace("/admin/config/", "");
+
+        if (subRoute === "costos") {
+          if (method === "GET") return json(200, await configRepository.getCostos(), headers);
+          if (method === "PUT") {
+            const body = parseBody(event);
+            const result = await configRepository.updateCostos(body);
+            return json(200, result, headers);
+          }
+        }
+        
+        if (subRoute === "popup") {
+          if (method === "GET") return json(200, await configRepository.getPopupConfig(), headers);
+          if (method === "PUT") {
+            const body = parseBody(event);
+            const result = await configRepository.updatePopupConfig(body);
+            return json(200, result, headers);
+          }
+        }
+
+        if (subRoute === "planes") {
+          if (method === "GET") return json(200, await configRepository.getPlanes(), headers);
+          if (method === "PUT") {
+            const body = parseBody(event);
+            const result = await configRepository.updatePlanes(body);
+            return json(200, result, headers);
+          }
+        }
+      }
+
+      // --- ENDPOINTS DE METRICAS ---
+      if (routePath === "/admin/metrics" && method === "GET") {
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+        return json(200, await metricsRepository.getMetrics(), headers);
+      }
+      
+      if (routePath === "/metrics/comprobante-clicks" && method === "POST") {
+        await metricsRepository.incrementComprobanteClicks();
+        return json(200, { ok: true }, headers);
       }
 
       const emailMatch = routePath.match(/^\/customers\/([^/]+)\/email$/);

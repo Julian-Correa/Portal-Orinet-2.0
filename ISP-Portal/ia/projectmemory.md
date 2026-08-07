@@ -21,7 +21,8 @@
 - Las credenciales viven en backend/env, nunca en el bundle.
 - El contrato fuente para la UI es el payload agregado de `/customer-summary`.
 - El fallback por defecto ante ausencia de Redis es memoria local.
-- El repo no tiene DB propia; no asumir migraciones, ORM ni persistencia interna.
+- El repo usa Netlify Blobs para persistencia de configuración y métricas (con un adapter local para desarrollo vía `npm run dev`); no hay ORM ni base de datos relacional tradicional.
+- La sesión (tanto de cliente como de administrador) se persiste en `sessionStorage` para sobrevivir a recargas de página.
 - La documentacion tecnica vive en `ia/` y debe mantenerse actualizada con cada cambio relevante.
 
 ## Hotspots tecnicos
@@ -44,13 +45,14 @@
 - Express y Netlify usan el mismo handler HTTP.
 - Hay tests automatizados para service, repository y endpoints.
 
-## Prioridades 2.0
+## Prioridades 2.0 (Basadas en prompt-maestro-v2.md)
 
-1. Refactorizar el frontend: extraer componentes, hooks y separar concerns.
-2. Mejorar UX: diseno visual, estados de carga, feedback de errores.
-3. Nuevas funcionalidades segun necesidad del negocio.
-4. Observabilidad: logging estructurado y monitoreo de errores del proveedor.
-5. Evaluar rate limit distribuido si el trafico crece.
+1. Implementar Netlify Blobs para configuración dinámica y métricas (incluyendo adapter local).
+2. Incorporar React Router y refactorizar `App.jsx` para soportar navegación múltiple.
+3. Crear Panel de Administración y Login unificado por DNI/Código.
+4. Implementar vistas simples: Nosotros, Facturación, Mis servicios.
+5. Desarrollar vistas complejas: Perfil (edición email, no teléfono) y Planes.
+6. Lógica de Negocio de Compromisos de Pago con restricciones de fechas (fechas pasadas bloqueadas).
 
 ## Como seguir trabajando
 

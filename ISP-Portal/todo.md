@@ -1,95 +1,61 @@
 # TODO — Portal OriNet 2.0
 
-Estados: `pendiente` · `en-proceso` · `hecho`
+Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 
 ---
 
-## Completado en v1
-
-Las siguientes mejoras fueron implementadas en el repositorio original y forman parte de la base estable de la v2:
-
-- Sacar `.env` del control de versiones
-- CORS estricto y errores sin fugas
-- Tests con Vitest y Supertest
-- Unificar capa HTTP Express / Netlify Function (handler canonico)
-- Reglas de negocio configurables desde backend
-- CI con GitHub Actions
-- Limpieza de codigo
-- Manejo de errores de red en `updateCustomerEmail`
-- Estabilizar Vite 8.x
-- Documentacion IA completa
+## Completado en v1 (Base estable)
+- [x] Sacar `.env` del control de versiones
+- [x] CORS estricto y errores sin fugas
+- [x] Tests con Vitest y Supertest
+- [x] Unificar capa HTTP Express / Netlify Function
+- [x] Reglas de negocio servidas desde backend
 
 ---
 
-## A — Refactor Frontend
+## 1. Capa de Datos y Admin (Netlify Blobs)
+- [x] 1.1 Instalar dependencia `@netlify/blobs`.
+- [x] 1.2 Crear `server/repositories/blobAdapter.js` (Lógica para archivo JSON en local / Blobs en prod).
+- [x] 1.3 Crear `configRepository.js` (costos, planes, popup).
+- [x] 1.4 Crear `metricsRepository.js` (visitas, clicks).
+- [x] 1.5 Crear endpoints internos en `apiHandler.js` para CRUD de configuración.
+- [x] 1.6 Migrar `recargoReconexion` desde .env/memoria a leer desde `configRepository`.
 
-### A1 — Extraer hooks de estado y networking
-- Estado: pendiente
-- Motivo: `App.jsx` concentra logica de sesion, fetching y estado global. Extraer hooks como `useCustomerSession` y `useCustomerSummary` para separar concerns.
-- Archivos afectados: `src/App.jsx`, nuevos archivos en `src/hooks/`.
+## 2. Router y Refactor Base (Frontend)
+- [x] 2.1 Instalar `react-router-dom`.
+- [x] 2.2 Configurar esquema de rutas en `main.jsx` / `App.jsx`.
+- [x] 2.3 Extraer lógica de `App.jsx` a custom hooks (ej. `useCustomerSession`).
+- [x] 2.4 Migrar estado de sesión a `sessionStorage` para persistencia.
+- [x] 2.5 Crear componente `Navbar` base y layout principal.
 
-### A2 — Centralizar manejo de estado global
-- Estado: pendiente
-- Motivo: el estado de sesion se pasa por props desde App. Evaluar Context API o store liviano para desacoplar componentes.
-- Depende de: A1.
+## 3. Autenticación Administrador
+- [x] 3.1 Agregar lógica en backend para validar `ADMIN_ACCESS_CODE`.
+- [x] 3.2 Modificar el form de login para redirigir a `/admin` si detecta el código.
 
-### A3 — Evaluar router
-- Estado: pendiente
-- Motivo: si se agregan nuevas pantallas o flujos en 2.0, un router (React Router u otro) simplifica la navegacion y permite deep linking.
-- Nota: solo implementar si hay multiples rutas reales. No agregar complejidad innecesaria.
+## 4. Panel de Administración (Frontend)
+- [x] 4.1 Crear vista principal `/admin` protegida.
+- [x] 4.2 Crear formulario para Costos y configuración del Popup.
+- [x] 4.3 Crear CRUD visual para Catálogo de Planes.
+- [x] 4.4 Mostrar dashboard básico con métricas (visitas, clicks).
 
-### A4 — Mejorar separacion de componentes
-- Estado: pendiente
-- Motivo: los componentes existentes (LoginScreen, ProfileScreen, EmailCard) reciben muchas props desde App. Encapsular logica propia en cada componente.
-- Depende de: A1, A2.
+## 5. Vistas Simples (Cliente)
+- [x] 5.1 Crear vista `/nosotros` (estática, con imagen hardcodeada).
+- [x] 5.2 Crear vista `/facturacion` (mover botón actual de descarga).
+- [x] 5.3 Crear vista `/servicios` (mostrar plan actual y `extra1/2/3` crudos).
 
----
+## 6. Vista Perfil
+- [x] 6.1 Mover card de perfil actual a ruta `/perfil`.
+- [x] 6.2 Integrar funcionalidad existente de edición de email en esta nueva vista.
 
-## B — Mejora de UX
+## 7. Catálogo de Planes
+- [x] 7.1 Crear vista `/planes`.
+- [x] 7.2 Integrar GET a la API de Blobs para listar los planes.
+- [x] 7.3 Armar Cards de visualización sin imagen.
+- [x] 7.4 Botón "Solicitar" con generación dinámica de mensaje de WhatsApp.
 
-### B1 — Rediseno visual
-- Estado: pendiente
-- Motivo: la v1 tiene un diseno funcional pero basico. La v2 es oportunidad para mejorar la identidad visual.
-
-### B2 — Mejores estados de carga y feedback
-- Estado: pendiente
-- Motivo: mejorar spinners, skeletons, transiciones y mensajes de error para una experiencia mas pulida.
-
-### B3 — Accesibilidad basica
-- Estado: pendiente
-- Motivo: revisar contraste, labels, navegacion por teclado y roles ARIA en los componentes principales.
-
----
-
-## C — Nuevas funcionalidades
-
-### C1 — (Por definir segun necesidad del negocio)
-- Estado: pendiente
-- Nota: agregar aqui features nuevas a medida que se definan.
-
----
-
-## D — Infraestructura y observabilidad
-
-### D1 — Logging estructurado
-- Estado: pendiente
-- Motivo: los errores del proveedor se loguean con `console.error`. Evaluar un formato estructurado para mejor debugging en Netlify.
-
-### D2 — Rate limit distribuido
-- Estado: pendiente
-- Motivo: el rate limit actual es por instancia de funcion. Si el trafico crece, evaluar solucion distribuida (Redis o similar).
-- Prioridad: baja hasta que el trafico lo justifique.
-
-### D3 — Mover express/cors a devDependencies
-- Estado: pendiente
-- Motivo: `express` y `cors` solo se usan en desarrollo local, no en el runtime serverless. Moverlos a `devDependencies` reduce el tiempo de install en Netlify.
-
----
-
-## Orden sugerido
-
-1. A1 -> A2 -> A4 (refactor frontend, base para todo lo demas)
-2. B1 -> B2 -> B3 (UX, en paralelo con refactor si es posible)
-3. A3 (router, solo si se agregan pantallas)
-4. C1+ (features nuevas)
-5. D1 -> D2 -> D3 (infra, segun necesidad)
+## 8. Compromisos de Pago
+- [ ] 8.1 Crear función utilitaria para cálculo de ventana de fechas (con Unit Tests en Vitest).
+- [ ] 8.2 Crear vista `/compromisos`.
+- [ ] 8.3 Implementar lógica para cuentas bloqueadas (Días 26/27, mensajes especiales).
+- [ ] 8.4 Integrar Datepicker limitando fechas pasadas (`max(hoy, inicio_ventana)`).
+- [ ] 8.5 Generar mensajes de WhatsApp dinámicos según estado de cuenta.

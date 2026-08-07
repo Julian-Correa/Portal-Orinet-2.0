@@ -20,6 +20,19 @@
 - Se actualizo Vite a la version estable 8.x y se eliminaron los `overrides` previos.
 - Se limpiaron duplicados y codigo muerto del frontend, incluido `react.svg` sin uso.
 
+## 2026-08-07
+
+### Fases 1 a 7 (Portal v2.0 - Core, Router y Admin)
+
+- Se introdujo `react-router-dom` y se refactorizó `App.jsx` para soportar múltiples vistas con un `MainLayout` y `Navbar`.
+- Se extrajo el estado global y de sesión en el custom hook `useCustomerSession` persistiendo en `sessionStorage`.
+- Se integró una capa de persistencia mediante `@netlify/blobs` (y un fallback local por archivos) para guardar la configuración (Costos, Popup) y métricas de uso.
+- Se agregaron endpoints administrativos a la capa HTTP en `/admin/*` autorizados a través del código `ADMIN_ACCESS_CODE`.
+- Se construyó el `AdminDashboard.jsx`, permitiendo a los administradores iniciar sesión con un código y ver un panel de control con formulario de popup, tabla de costos, CRUD de planes y tarjetas de métricas.
+- Se implementaron las vistas de cliente: `/perfil` (limpia y reestructurada), `/servicios`, `/facturacion`, `/nosotros` y `/planes`.
+- El catálogo de planes ahora lee datos desde la base administrada en los Blobs en vez de consultar ISPCube, permitiendo edición comercial.
+- Se incluyó `prompt-maestro-v2.md` a la documentación oficial como guía del desarrollo.
+
 ## 2026-08-05
 
 ### Kickoff Portal OriNet 2.0

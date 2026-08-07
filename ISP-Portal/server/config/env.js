@@ -72,6 +72,7 @@ export const env = {
   bodyLimitBytes: parseBodyLimit(bodyLimit),
   rateLimitWindowMs: numberEnv("RATE_LIMIT_WINDOW_MS", 60000),
   rateLimitMax: numberEnv("RATE_LIMIT_MAX", 30),
+  adminAccessCode: cleanEnv(process.env.ADMIN_ACCESS_CODE) || "123321",
   recargoReconexion: numberEnv("RECARGO_RECONEXION", 2000),
   recargoSegundoVencimiento: numberEnv("RECARGO_SEGUNDO_VENCIMIENTO", 2000),
   cutDay: dayOfMonthEnv("CUT_DAY", 26),

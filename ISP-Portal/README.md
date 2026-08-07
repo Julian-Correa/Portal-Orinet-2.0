@@ -142,9 +142,11 @@ La carpeta `ia/` contiene documentacion detallada del proyecto para continuidad:
 - `user-flows.md` - flujos de usuario
 - `decision.md` - decisiones tecnicas vigentes
 - `changelog.md` - historial de cambios
+- `prompt-maestro-v2.md` - Especificación funcional y técnica para la v2.0
 
 ## Notas
 
 - `.env` no debe versionarse.
 - El CBU se toma de `customer_cbu[0]`; si no existe, se muestra solo el alias fijo.
 - El acceso por DNI sin OTP es una decision de negocio vigente para este proyecto.
+- Configuración y Métricas: A partir de la versión 2.0 se utiliza Netlify Blobs como fuente de verdad para parámetros configurables y métricas (con adaptador JSON para desarrollo local).

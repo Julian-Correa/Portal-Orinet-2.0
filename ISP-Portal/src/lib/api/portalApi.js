@@ -58,6 +58,10 @@ export async function fetchCustomerSummaryByDNI(dni) {
 
   const data = await readPortalJson(response);
 
+  if (data?.isAdmin) {
+    return { isAdmin: true, code: dni };
+  }
+
   if (!data?.customer?.id) {
     throw new PortalApiError("No encontramos una cuenta asociada a ese DNI.", 404);
   }

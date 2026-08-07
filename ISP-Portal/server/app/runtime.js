@@ -3,6 +3,8 @@ import { CacheClient } from "../lib/cache.js";
 import { IspRepository } from "../repositories/ispRepository.js";
 import { CustomerSummaryService } from "../services/customerSummaryService.js";
 
+import { configRepository } from "../repositories/configRepository.js";
+
 let runtimePromise;
 
 export async function getRuntime() {
@@ -21,9 +23,11 @@ export async function getRuntime() {
       const customerSummaryService = new CustomerSummaryService({
         cache,
         ispRepository,
+        configRepository,
         cacheTtlSeconds: env.cacheTtlSeconds,
         billingRules: {
-          recargoReconexion: env.recargoReconexion,
+          // cutDay y recargoSegundoVencimiento siguen en env por ahora (no estaban explicitamente en Blobs)
+          // pero el servicio ahora usará configRepository para los dinámicos
           recargoSegundoVencimiento: env.recargoSegundoVencimiento,
           cutDay: env.cutDay,
         },

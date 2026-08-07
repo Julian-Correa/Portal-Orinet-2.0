@@ -1,10 +1,10 @@
 export class CustomerSummaryService {
-  constructor({ cache, ispRepository, cacheTtlSeconds, billingRules = {} }) {
+  constructor({ cache, ispRepository, configRepository, cacheTtlSeconds, billingRules = {} }) {
     this.cache = cache;
     this.ispRepository = ispRepository;
+    this.configRepository = configRepository;
     this.cacheTtlSeconds = cacheTtlSeconds;
     this.billingRules = {
-      recargoReconexion: Number(billingRules.recargoReconexion ?? 2000),
       recargoSegundoVencimiento: Number(billingRules.recargoSegundoVencimiento ?? 2000),
       cutDay: Number(billingRules.cutDay ?? 26),
     };
@@ -85,9 +85,10 @@ export class CustomerSummaryService {
       return { error: "cliente no encontrado", status: 404 };
     }
 
-    const [invoiceUrl, connection] = await Promise.all([
+    const [invoiceUrl, connection, costos] = await Promise.all([
       this.ispRepository.findLastInvoiceUrl(customer.id, token),
       this.ispRepository.findConnectionByCustomer(customer, token),
+      this.configRepository ? this.configRepository.getCostos() : { recargoReconexion: 2000 }
     ]);
     const plan = await this.ispRepository.findPlanById(connection?.plan_id, token);
     const payload = {
@@ -97,7 +98,7 @@ export class CustomerSummaryService {
         plan: plan?.name || (connection?.plan_id ? `Plan ${connection.plan_id}` : "No informado"),
         price: plan?.price ? this.formatMoney(plan.price) : "No informado",
       },
-      recargoReconexion: this.billingRules.recargoReconexion,
+      recargoReconexion: costos.recargoReconexion,
       recargoSegundoVencimiento: this.billingRules.recargoSegundoVencimiento,
       cutDay: this.billingRules.cutDay,
       generatedAt: new Date().toISOString(),
@@ -106,6 +107,11 @@ export class CustomerSummaryService {
     await this.cache.set(cacheKey, payload, this.cacheTtlSeconds);
 
     return { data: payload, cacheStatus: "MISS", status: 200 };
+  }
+
+  async getPlanes() {
+    const token = await this.ispRepository.getToken();
+    return await this.ispRepository.getPlanes(token);
   }
 
   async updateEmail(rawDni, email) {

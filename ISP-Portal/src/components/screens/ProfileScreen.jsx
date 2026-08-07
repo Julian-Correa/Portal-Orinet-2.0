@@ -1,35 +1,25 @@
 import { useState } from "react";
 
-import DownloadIcon from "../icons/DownloadIcon.jsx";
-import LogoutIcon from "../icons/LogoutIcon.jsx";
 import WhatsAppIcon from "../icons/WhatsAppIcon.jsx";
-import OriNetLogo from "../layout/OriNetLogo.jsx";
 import EmailCard from "../profile/EmailCard.jsx";
 import {
-  LINKEDIN_URL,
-  WHATSAPP_SOPORTE_URL,
   WHATSAPP_URL,
 } from "../../lib/config/portalConfig.js";
-import { getConnectionPlanInfo, getCutoffDate, getServiceStatus } from "../../lib/utils/customer.js";
+import { getCutoffDate, getServiceStatus } from "../../lib/utils/customer.js";
 import { formatMoney, formatName } from "../../lib/utils/format.js";
 
 export default function ProfileScreen({
   customer,
-  invoiceUrl: initialInvoiceUrl,
-  planInfo: initialPlanInfo,
   recargoReconexion = 2000,
   recargoSegundoVencimiento = 2000,
   cutDay = 26,
-  onLogout,
   onUpdateCustomer,
 }) {
   const [copied, setCopied] = useState(null);
-  const invoiceUrl = initialInvoiceUrl || null;
 
   const debt = parseFloat(customer.debt) || 0;
   const dueDebt = parseFloat(customer.duedebt) || 0;
   const serviceStatus = getServiceStatus(customer.status);
-  const planInfo = initialPlanInfo || getConnectionPlanInfo(null);
   const currentDay = new Date().getDate();
   const recargo = serviceStatus.suspended ? recargoReconexion : 0;
   const recargoSegundoVencimientoVisible = debt > 0 && currentDay >= 11 && currentDay <= 25;
@@ -59,55 +49,9 @@ export default function ProfileScreen({
   return (
     <div
       style={{
-        minHeight: "100vh",
-          background: "linear-gradient(160deg, #0a0f1e 0%, #0d2240 55%, #0a1a35 100%)",
         fontFamily: "'Outfit', sans-serif",
-        paddingBottom: 60,
       }}
     >
-      <div
-        style={{
-          background: "rgba(255,255,255,0.03)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          padding: "12px 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <OriNetLogo size="small" />
-        <button
-          type="button"
-          onClick={onLogout}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 8,
-            padding: "8px 14px",
-            color: "#64748b",
-            fontSize: 13,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            fontWeight: 600,
-            transition: "all 0.15s",
-          }}
-          onMouseEnter={(event) => {
-            event.currentTarget.style.background = "rgba(255,255,255,0.1)";
-            event.currentTarget.style.color = "#f8fafc";
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            event.currentTarget.style.color = "#64748b";
-          }}
-        >
-          <LogoutIcon /> Cerrar sesión
-        </button>
-      </div>
-
       <div className="profile-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 28px 60px" }}>
         <div style={{ marginBottom: 28, animation: "fadeUp 0.4s ease" }}>
           <p style={{ margin: "0 0 2px", color: "#cbd5e1", fontSize: 14 }}>Bienvenido/a,</p>
@@ -333,97 +277,9 @@ export default function ProfileScreen({
                 </div>
               )}
             </div>
-
-            <div
-              style={{
-                background: "linear-gradient(135deg, rgba(56,189,248,0.08), rgba(56,189,248,0.03))",
-                border: "1px solid rgba(56,189,248,0.2)",
-                borderRadius: 20,
-                padding: "20px 24px",
-                marginBottom: 14,
-                animation: "fadeUp 0.5s ease 0.22s both",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 14,
-              }}
-            >
-              <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                <div
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 11,
-                    flexShrink: 0,
-                    background: "rgba(56,189,248,0.12)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.12 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3 1.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 5.61 5.61l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z" />
-                  </svg>
-                </div>
-                <div>
-                  <p style={{ margin: "0 0 2px", color: "#7dd3fc", fontWeight: 700, fontSize: 14 }}>Soporte técnico</p>
-                  <p style={{ margin: 0, color: "#64748b", fontSize: 12 }}>Sin servicio o problemas de conexión</p>
-                </div>
-              </div>
-              <a
-                href={WHATSAPP_SOPORTE_URL(
-                  `Hola, soy ${formatName(customer.name)}, DNI ${customer.doc_number}, código de cliente ${customer.code}, domicilio ${customer.address}. Estoy comunicándome para reportar que no cuento con servicio de internet y solicitar asistencia técnica.`
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  flexShrink: 0,
-                  background: "rgba(37,211,102,0.09)",
-                  border: "1px solid rgba(37,211,102,0.22)",
-                  color: "#4ade80",
-                  borderRadius: 10,
-                  padding: "10px 18px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  fontFamily: "inherit",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(event) => {
-                  event.currentTarget.style.background = "rgba(37,211,102,0.16)";
-                }}
-                onMouseLeave={(event) => {
-                  event.currentTarget.style.background = "rgba(37,211,102,0.09)";
-                }}
-              >
-                <WhatsAppIcon size={17} /> Contactar soporte
-              </a>
-            </div>
           </div>
 
           <div className="profile-col">
-            <div
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 20,
-                padding: "20px 24px",
-                marginBottom: 14,
-                animation: "fadeUp 0.5s ease 0.2s both",
-              }}
-            >
-              <p style={{ margin: "0 0 8px", color: "#f8fafc", fontWeight: 700, fontSize: 15 }}>Plan contratado</p>
-              <p style={{ margin: 0, color: "#cbd5e1", fontSize: 14, lineHeight: 1.5 }}>
-                Su plan es <span style={{ color: "#f8fafc", fontWeight: 700 }}>{planInfo.plan}</span> - <span style={{ color: "#10b981", fontWeight: 800 }}>{planInfo.price}</span>
-              </p>
-            </div>
-
             <div
               style={{
                 background: "rgba(255,255,255,0.04)",
@@ -512,56 +368,6 @@ export default function ProfileScreen({
 
             <div
               style={{
-                background: "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 20,
-                padding: "22px 24px",
-                marginBottom: 14,
-                animation: "fadeUp 0.5s ease 0.2s both",
-              }}
-            >
-              <p style={{ margin: "0 0 3px", color: "#f8fafc", fontWeight: 700, fontSize: 15 }}>📄 Última factura</p>
-              <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13 }}>Nº de cliente: {customer.code}</p>
-              {invoiceUrl ? (
-                <a
-                  href={invoiceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 10,
-                    background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                    color: "#fff",
-                    borderRadius: 12,
-                    padding: "13px 24px",
-                    fontWeight: 700,
-                    fontSize: 15,
-                    textDecoration: "none",
-                    fontFamily: "inherit",
-                    boxShadow: "0 6px 20px rgba(99,102,241,0.25)",
-                    transition: "opacity 0.2s",
-                  }}
-                  onMouseEnter={(event) => {
-                    event.currentTarget.style.opacity = "0.88";
-                  }}
-                  onMouseLeave={(event) => {
-                    event.currentTarget.style.opacity = "1";
-                  }}
-                >
-                  <DownloadIcon /> Descargar factura (PDF)
-                </a>
-              ) : (
-                <p style={{ margin: 0, color: "#cbd5e1", fontSize: 13 }}>
-                  No hay facturas disponibles por el momento.
-                </p>
-              )}
-            </div>
-
-            <div
-              style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.06)",
                 borderRadius: 16,
@@ -639,23 +445,6 @@ export default function ProfileScreen({
           </div>
         </div>
       </div>
-
-      <footer style={{ marginTop: 48, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px 28px", textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", color: "#fff", fontSize: 13 }}>
-          © {new Date().getFullYear()} OriNet ISP S.R.L. — Todos los derechos reservados.
-        </p>
-        <p style={{ margin: 0, color: "#cbd5e1", fontSize: 12 }}>
-          Portal de clientes · Desarrollado por{" "}
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: "#cbd5e1", fontWeight: 700, textDecoration: "none" }}
-          >
-            Julián Correa
-          </a>
-        </p>
-      </footer>
 
       <style>{`
         @keyframes fadeUp {

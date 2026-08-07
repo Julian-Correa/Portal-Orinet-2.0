@@ -54,3 +54,14 @@
 ### Popup comercial
 
 - Existe soporte para popup de imagen, pero hoy esta desactivado con `POPUP_CONFIG.enabled = false`.
+
+### Compromisos de pago (v2)
+
+- **Cliente NO bloqueado:**
+  - Debe tener deuda vencida (`duedebt`) <= umbral configurable (default: 10.000). Si la supera, se le indica que debe pagar.
+  - La ventana de fechas de compromiso depende del ciclo de facturación (26 al 10 del mes siguiente).
+  - Nunca puede elegirse una fecha pasada. El selector restringe entre `max(hoy, inicio_de_ventana)` y el fin de ventana.
+- **Cliente bloqueado / suspendido:**
+  - Solo pueden solicitar compromisos a través del portal los días definidos (ej. 26 y 27 de cada mes).
+  - La fecha del compromiso para ellos se asigna al día actual, y se les cobra recargo por reconexión + compromiso.
+  - Si intentan solicitarlo fuera de los días permitidos, se muestra el mensaje: *"Las solicitudes de compromiso de pago mediante el portal para cuentas suspendidas solo están habilitadas los días 26 y 27 de cada mes. Para solicitar compromiso de pago escribanos al whatsapp de administracion."*

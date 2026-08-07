@@ -13,8 +13,8 @@ export default function LoginScreen({ onLogin }) {
   const handleSubmit = async () => {
     const cleanDni = dni.trim().replace(/\D/g, "");
 
-    if (cleanDni.length < 7 || cleanDni.length > 8) {
-      setError("Ingresá un DNI válido (7 u 8 dígitos, sin puntos ni espacios).");
+    if (cleanDni.length < 6 || cleanDni.length > 8) {
+      setError("Ingresá un DNI o código válido.");
       return;
     }
 
@@ -26,7 +26,7 @@ export default function LoginScreen({ onLogin }) {
       onLogin(summary);
     } catch (requestError) {
       if (requestError instanceof PortalApiError && requestError.status === 400) {
-        setError("Ingresa un DNI valido (7 u 8 digitos, sin puntos ni espacios).");
+        setError("Ingresa un DNI o código válido.");
       } else if (requestError instanceof PortalApiError && requestError.status === 404) {
         setError("No encontramos una cuenta asociada a ese DNI. Verifica e intenta nuevamente.");
       } else if (
