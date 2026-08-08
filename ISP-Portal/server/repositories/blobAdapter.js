@@ -3,8 +3,14 @@ import path from "path";
 import { getStore } from "@netlify/blobs";
 import { fileURLToPath } from "url";
 
-const _currentFileName = fileURLToPath(import.meta.url);
-const _currentDirName = path.dirname(_currentFileName);
+let _currentDirName = "";
+if (typeof __dirname !== "undefined") {
+  _currentDirName = __dirname;
+} else if (typeof import.meta !== "undefined" && import.meta.url) {
+  _currentDirName = path.dirname(fileURLToPath(import.meta.url));
+} else {
+  _currentDirName = process.cwd();
+}
 const LOCAL_STORE_PATH = path.join(_currentDirName, "../../.local-blobs.json");
 
 /**
