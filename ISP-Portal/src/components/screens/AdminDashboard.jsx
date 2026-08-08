@@ -97,7 +97,6 @@ export default function AdminDashboard({ session }) {
     const newCostos = { ...costos, [key]: val };
     setSavingCostos(true);
     setError("");
-    setMessage("");
 
     try {
       await adminApi.updateCostos(adminCode, newCostos);
