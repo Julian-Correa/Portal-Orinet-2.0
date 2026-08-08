@@ -131,16 +131,16 @@ export default function AdminDashboard({ session }) {
         {/* Métricas */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-            <span className="text-2xl mr-3 bg-blue-500/20 p-2 rounded-lg">📊</span> Métricas de Uso
+            <span className="text-xl mr-3 bg-white/10 text-white p-2.5 rounded-xl border border-white/5 shadow-sm">📊</span> Métricas de Uso
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-black/20 border border-white/5 rounded-xl p-5 text-center transition-transform hover:scale-[1.02]">
-              <p className="text-sm text-sky-400 font-bold uppercase tracking-wider mb-2">Visitas Totales</p>
-              <p className="text-4xl font-extrabold text-white">{metrics.visits}</p>
+            <div className="bg-white/5 border border-white/5 rounded-xl p-6 text-center transition-transform hover:scale-[1.02] shadow-sm backdrop-blur-sm">
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3">Visitas Totales</p>
+              <p className="text-5xl font-light text-white">{metrics.visits}</p>
             </div>
-            <div className="bg-black/20 border border-white/5 rounded-xl p-5 text-center transition-transform hover:scale-[1.02]">
-              <p className="text-sm text-[#10b981] font-bold uppercase tracking-wider mb-2">Comprobantes</p>
-              <p className="text-4xl font-extrabold text-white">{metrics.comprobanteClicks}</p>
+            <div className="bg-white/5 border border-white/5 rounded-xl p-6 text-center transition-transform hover:scale-[1.02] shadow-sm backdrop-blur-sm">
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-3">Comprobantes</p>
+              <p className="text-5xl font-light text-white">{metrics.comprobanteClicks}</p>
             </div>
           </div>
         </div>
@@ -148,14 +148,14 @@ export default function AdminDashboard({ session }) {
         {/* Costos Form */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-            <span className="text-2xl mr-3 bg-emerald-500/20 p-2 rounded-lg">💰</span> Reglas y Costos
+            <span className="text-xl mr-3 bg-white/10 text-white p-2.5 rounded-xl border border-white/5 shadow-sm">💰</span> Reglas y Costos
           </h2>
           <form onSubmit={handleSaveCostos} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">Recargo por reconexión ($)</label>
               <input 
                 type="number" 
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30 transition-all min-h-[44px]"
                 value={costos.recargoReconexion}
                 onChange={e => setCostos({...costos, recargoReconexion: Number(e.target.value)})}
               />
@@ -164,7 +164,7 @@ export default function AdminDashboard({ session }) {
               <label className="block text-sm font-semibold text-slate-300 mb-2">Costo de compromiso de pago ($)</label>
               <input 
                 type="number" 
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30 transition-all min-h-[44px]"
                 value={costos.costoCompromiso}
                 onChange={e => setCostos({...costos, costoCompromiso: Number(e.target.value)})}
               />
@@ -173,7 +173,7 @@ export default function AdminDashboard({ session }) {
               <label className="block text-sm font-semibold text-slate-300 mb-2">Umbral max. deuda vencida ($)</label>
               <input 
                 type="number" 
-                className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all min-h-[44px]"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30 transition-all min-h-[44px]"
                 value={costos.umbralDeudaVencida}
                 onChange={e => setCostos({...costos, umbralDeudaVencida: Number(e.target.value)})}
               />
@@ -181,7 +181,7 @@ export default function AdminDashboard({ session }) {
             <button 
               type="submit" 
               disabled={savingCostos}
-              className="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg min-h-[44px] flex justify-center items-center"
+              className="w-full mt-2 bg-white/10 hover:bg-white/15 border border-white/10 disabled:opacity-50 text-white font-semibold tracking-wide py-3 px-4 rounded-xl transition-all shadow-sm min-h-[44px] flex justify-center items-center backdrop-blur-sm"
             >
               {savingCostos ? "Guardando..." : "Guardar Costos"}
             </button>
@@ -193,14 +193,14 @@ export default function AdminDashboard({ session }) {
         {/* Popup Form */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-            <span className="text-2xl mr-3 bg-purple-500/20 p-2 rounded-lg">🖼️</span> Popup Comercial
+            <span className="text-xl mr-3 bg-white/10 text-white p-2.5 rounded-xl border border-white/5 shadow-sm">🖼️</span> Popup Comercial
           </h2>
           <form onSubmit={handleSavePopup} className="space-y-5">
             <div className="flex items-center mb-6 p-4 bg-black/20 rounded-xl border border-white/5">
               <input 
                 type="checkbox" 
                 id="popupEnabled"
-                className="h-5 w-5 text-purple-500 bg-black/50 border-white/20 rounded focus:ring-purple-500 focus:ring-offset-0 min-h-[44px] min-w-[44px]"
+                className="h-5 w-5 text-white bg-white/10 border-white/20 rounded focus:ring-white/30 focus:ring-offset-0 min-h-[44px] min-w-[44px] transition-all"
                 checked={popup.enabled}
                 onChange={e => setPopup({...popup, enabled: e.target.checked})}
               />
@@ -214,7 +214,7 @@ export default function AdminDashboard({ session }) {
                 <label className="block text-sm font-semibold text-slate-300 mb-2">URL de la Imagen</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
                   value={popup.imageUrl}
                   placeholder="https://ejemplo.com/imagen.jpg"
                   onChange={e => setPopup({...popup, imageUrl: e.target.value})}
@@ -225,7 +225,7 @@ export default function AdminDashboard({ session }) {
                 <label className="block text-sm font-semibold text-slate-300 mb-2">Enlace al hacer click (opcional)</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
                   value={popup.linkUrl}
                   placeholder="https://ejemplo.com/promo"
                   onChange={e => setPopup({...popup, linkUrl: e.target.value})}
@@ -237,7 +237,7 @@ export default function AdminDashboard({ session }) {
             <button 
               type="submit" 
               disabled={savingPopup}
-              className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg min-h-[44px]"
+              className="mt-6 w-full md:w-auto bg-white/10 hover:bg-white/15 border border-white/10 disabled:opacity-50 text-white font-semibold tracking-wide py-3 px-8 rounded-xl transition-all shadow-sm min-h-[44px] backdrop-blur-sm"
             >
               {savingPopup ? "Guardando..." : "Guardar Popup"}
             </button>
@@ -248,11 +248,11 @@ export default function AdminDashboard({ session }) {
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 md:p-8 mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 className="text-xl font-bold text-white flex items-center">
-            <span className="text-2xl mr-3 bg-orange-500/20 p-2 rounded-lg">📋</span> Catálogo de Planes
+            <span className="text-xl mr-3 bg-white/10 text-white p-2.5 rounded-xl border border-white/5 shadow-sm">📋</span> Catálogo de Planes
           </h2>
           <button 
             onClick={handleAddPlan}
-            className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold py-2.5 px-5 rounded-xl text-sm transition-all min-h-[44px]"
+            className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold tracking-wide py-2.5 px-5 rounded-xl text-sm transition-all min-h-[44px] backdrop-blur-sm flex items-center justify-center"
           >
             + Agregar Plan
           </button>
@@ -282,7 +282,7 @@ export default function AdminDashboard({ session }) {
                       value={plan.nombre}
                       onChange={(e) => handlePlanChange(plan.id, 'nombre', e.target.value)}
                       placeholder="Ej: Plan Fibra 100"
-                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -292,7 +292,7 @@ export default function AdminDashboard({ session }) {
                       value={plan.velocidad}
                       onChange={(e) => handlePlanChange(plan.id, 'velocidad', e.target.value)}
                       placeholder="Ej: 100 Mbps"
-                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -302,7 +302,7 @@ export default function AdminDashboard({ session }) {
                       value={plan.precio}
                       onChange={(e) => handlePlanChange(plan.id, 'precio', e.target.value)}
                       placeholder="Ej: $ 15.000"
-                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px]"
                     />
                   </div>
                   <div className="md:col-span-3">
@@ -312,7 +312,7 @@ export default function AdminDashboard({ session }) {
                       value={plan.descripcion}
                       onChange={(e) => handlePlanChange(plan.id, 'descripcion', e.target.value)}
                       placeholder="Ej: Ideal para familias, Netflix y juegos."
-                      className="w-full px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 min-h-[44px]"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function AdminDashboard({ session }) {
         <button 
           onClick={handleSavePlanes}
           disabled={savingPlanes}
-          className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 disabled:opacity-50 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg min-h-[44px]"
+          className="w-full sm:w-auto bg-white/10 hover:bg-white/15 border border-white/10 disabled:opacity-50 text-white font-semibold tracking-wide py-3 px-8 rounded-xl transition-all shadow-sm min-h-[44px] backdrop-blur-sm"
         >
           {savingPlanes ? "Guardando..." : "Guardar Catálogo de Planes"}
         </button>
