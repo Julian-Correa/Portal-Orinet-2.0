@@ -21,14 +21,16 @@ export default function NosotrosScreen() {
             garantizando que nuestros clientes disfruten de la mejor experiencia de navegación sin interrupciones.
           </p>
 
-          <h2 className="text-xl font-semibold text-white mt-8 mb-4 border-b border-white/10 pb-2">Área de Cobertura</h2>
-          <div className="bg-white/10 rounded-xl p-4 flex justify-center items-center mb-8 border border-white/5">
-            {/* Placeholder for Coverage Map Image */}
-            <div className="text-center py-12">
-              <span className="text-4xl">🗺️</span>
-              <p className="mt-4 text-slate-400 font-medium">Mapa de Cobertura</p>
-              <p className="text-sm text-slate-500">(Imagen ilustrativa de zonas de alcance)</p>
-            </div>
+          <h2 className="text-xl font-semibold text-white mt-8 mb-4 border-b border-white/10 pb-2">Ubicación de Nuestro Local</h2>
+          <div className="bg-white/10 rounded-xl p-1 flex justify-center items-center mb-8 border border-white/5 overflow-hidden w-full">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3276.767880562612!2d-58.31740092483132!3d-34.78661836717963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95a32dfddb75d2c7%3A0xa461b67fded2ef37!2sOriNet!5e0!3m2!1ses-419!2sar!4v1786206778763!5m2!1ses-419!2sar" 
+              className="w-full h-[300px] sm:h-[450px] rounded-lg"
+              style={{ border: 0 }}
+              allowFullScreen="" 
+              loading="lazy" 
+              referrerPolicy="strict-origin-when-cross-origin"
+            ></iframe>
           </div>
 
           <h2 className="text-xl font-semibold text-white mt-8 mb-4 border-b border-white/10 pb-2">Contacto</h2>
