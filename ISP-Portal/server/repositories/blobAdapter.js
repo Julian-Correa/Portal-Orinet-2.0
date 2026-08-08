@@ -3,9 +3,9 @@ import path from "path";
 import { getStore } from "@netlify/blobs";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const LOCAL_STORE_PATH = path.join(__dirname, "../../.local-blobs.json");
+const _currentFileName = fileURLToPath(import.meta.url);
+const _currentDirName = path.dirname(_currentFileName);
+const LOCAL_STORE_PATH = path.join(_currentDirName, "../../.local-blobs.json");
 
 /**
  * Adapter para manejar Netlify Blobs en producción
