@@ -43,8 +43,13 @@ export const configRepository = {
 
   // --- Planes ---
   async getPlanes() {
+    const defaultPlanes = [
+      { id: "1", velocidad: "100 MB", precio: 28000, descripcion: "Ideal para navegación y redes sociales." },
+      { id: "2", velocidad: "200 MB", precio: 31000, descripcion: "Streaming, trabajo y entretenimiento." },
+      { id: "3", velocidad: "300 MB", precio: 34000, descripcion: "Mayor velocidad para toda tu casa." }
+    ];
     const planes = await configStore.get("config:planes");
-    return planes || [];
+    return planes && planes.length > 0 ? planes : defaultPlanes;
   },
 
   async updatePlanes(planesArray) {
