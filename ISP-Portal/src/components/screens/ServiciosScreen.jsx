@@ -5,19 +5,11 @@ import { formatName } from "../../lib/utils/format.js";
 
 export default function ServiciosScreen({ planInfo, customer }) {
   // Extraemos los extra del cliente (vienen en crudo de ISPCube)
-  const extrasCliente = [
+  const extras = [
     customer?.extra1,
     customer?.extra2,
     customer?.extra3
-  ].filter(extra => extra && typeof extra === "string" && extra.trim() !== "");
-
-  // Extraemos planes adicionales (extraplans) de la conexión
-  const extraPlanes = (planInfo?.extraplans || []).map(ep => {
-    if (typeof ep === "string") return ep;
-    return ep?.name || ep?.plan_name || ep?.descripcion || JSON.stringify(ep);
-  }).filter(Boolean);
-
-  const extras = [...extrasCliente, ...extraPlanes];
+  ].filter(extra => extra && extra.trim() !== "");
 
   const soporteMsg = customer ? `Hola, soy ${formatName(customer.name)}, DNI ${customer.doc_number}, código de cliente ${customer.code}, domicilio ${customer.address}. Estoy comunicándome para reportar que no cuento con servicio de internet y solicitar asistencia técnica.` : "";
 

@@ -49,9 +49,6 @@ export class CustomerSummaryService {
       debt: customer?.debt || "0",
       duedebt: customer?.duedebt || "0",
       status: customer?.status || "",
-      extra1: customer?.extra1 || "",
-      extra2: customer?.extra2 || "",
-      extra3: customer?.extra3 || "",
       city: {
         name: city.name || "",
         province: city.province || "",
@@ -100,8 +97,6 @@ export class CustomerSummaryService {
       planInfo: {
         plan: plan?.name || (connection?.plan_id ? `Plan ${connection.plan_id}` : "No informado"),
         price: plan?.price ? this.formatMoney(plan.price) : "No informado",
-        extra: connection?.extra || connection?.extras || null,
-        extraplans: connection?.extraplans || [],
       },
       recargoReconexion: costos.recargoReconexion,
       recargoSegundoVencimiento: this.billingRules.recargoSegundoVencimiento,
