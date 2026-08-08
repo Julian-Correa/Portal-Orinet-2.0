@@ -51,7 +51,12 @@ export class BlobAdapter {
       return storeData[key] || null;
     } else {
       try {
-        const store = getStore(this.storeName);
+        const storeOptions = { name: this.storeName };
+        if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_API_TOKEN) {
+          storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+          storeOptions.token = process.env.NETLIFY_API_TOKEN;
+        }
+        const store = getStore(storeOptions);
         return await store.get(key, { type: "json" });
       } catch (err) {
         if (err.name === 'MissingBlobsEnvironmentError' || err.message.includes('configured to use Netlify Blobs') || err.message.includes('No siteID')) {
@@ -75,7 +80,12 @@ export class BlobAdapter {
       await this._writeLocalData(data);
     } else {
       try {
-        const store = getStore(this.storeName);
+        const storeOptions = { name: this.storeName };
+        if (process.env.NETLIFY_SITE_ID && process.env.NETLIFY_API_TOKEN) {
+          storeOptions.siteID = process.env.NETLIFY_SITE_ID;
+          storeOptions.token = process.env.NETLIFY_API_TOKEN;
+        }
+        const store = getStore(storeOptions);
         await store.setJSON(key, value);
       } catch (err) {
         if (err.name === 'MissingBlobsEnvironmentError' || err.message.includes('configured to use Netlify Blobs') || err.message.includes('No siteID')) {
