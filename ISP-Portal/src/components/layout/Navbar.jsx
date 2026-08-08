@@ -17,8 +17,9 @@ export default function Navbar({ onLogout, isAdmin }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-4">
-            <div className="font-bold text-xl tracking-wider mr-4">
+            <div className="font-bold text-xl tracking-wider flex items-baseline gap-2">
               OriNet
+              {isAdmin && <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full uppercase tracking-widest hidden sm:inline-block">Panel Administrador</span>}
             </div>
             
             {isAdmin ? (
