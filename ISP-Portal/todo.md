@@ -59,3 +59,12 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 - [ ] 8.3 Implementar lógica para cuentas bloqueadas (Días 26/27, mensajes especiales).
 - [ ] 8.4 Integrar Datepicker limitando fechas pasadas (`max(hoy, inicio_ventana)`).
 - [ ] 8.5 Generar mensajes de WhatsApp dinámicos según estado de cuenta.
+
+## Handoff / Notas para la próxima sesión
+- **ISSUE Pendiente:** El cliente informa que se agregó un "extra" a la cuenta DNI 44129435 en ISPCube, pero no se refleja en el portal.
+- **Investigación:**
+  - Se probó mapear los campos `extra1`, `extra2`, `extra3` del modelo cliente de ISPCube, pero la API oficial los devuelve como `null`.
+  - Se probó mapear la llave `extraplans` de la conexión del cliente, pero la API la devuelve como un array vacío `[]`.
+  - Se probó mapear `extra_pack_name` de la conexión, que también devolvió `null`.
+  - El código que se intentó usar para mostrarlos fue revertido a su estado original (commit `0f9a8a5`).
+- **Próximos pasos a seguir:** Preguntar al usuario en qué pantalla/módulo exacto de ISPCube se dio de alta el extra (Facturación como "artículo extra", como "Plan Extra" desde conexión, etc.) para identificar a qué endpoint de ISPCube hay que apuntar para conseguir esa información, ya que los endpoints `/customer` y `/connection` estándar no lo están incluyendo.
