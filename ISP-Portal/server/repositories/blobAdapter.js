@@ -21,8 +21,9 @@ export class BlobAdapter {
   constructor(storeName) {
     this.storeName = storeName;
     // Si estamos en Netlify (usualmente NETLIFY=true o hay context de blobs)
-    // O si estamos en entorno productivo
-    this.isLocal = !process.env.NETLIFY && process.env.NODE_ENV !== "production";
+    // O si estamos en entorno productivo o entorno AWS Lambda (Netlify Functions)
+    const isLambda = !!process.env.AWS_EXECUTION_ENV || !!process.env.LAMBDA_TASK_ROOT || !!process.env.LAMBDA_RUNTIME_DIR;
+    this.isLocal = !process.env.NETLIFY && !isLambda && process.env.NODE_ENV !== "production";
   }
 
   async _readLocalData() {
