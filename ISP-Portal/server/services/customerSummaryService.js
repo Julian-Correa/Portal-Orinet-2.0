@@ -101,6 +101,7 @@ export class CustomerSummaryService {
         plan: plan?.name || (connection?.plan_id ? `Plan ${connection.plan_id}` : "No informado"),
         price: plan?.price ? this.formatMoney(plan.price) : "No informado",
         extra: connection?.extra || connection?.extras || null,
+        extraplans: connection?.extraplans || [],
       },
       recargoReconexion: costos.recargoReconexion,
       recargoSegundoVencimiento: this.billingRules.recargoSegundoVencimiento,
