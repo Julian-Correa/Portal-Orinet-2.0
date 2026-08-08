@@ -1,5 +1,17 @@
 ## 2026-08-08
 
+### Mejoras de Arquitectura, UI Administrador y Secciones (Fase 8)
+
+- Se reparó el adaptador de configuración local (`blobAdapter.js`) para que funcionase en AWS Lambda (Netlify Functions) cuando faltaba la variable `import.meta.url` de ES Modules y las variables de Netlify Blobs no existían en entorno de ejecución.
+- Se implementó un *fallback* (plan B) hacia el sistema de archivos temporal `/tmp/` si la API de Blobs no estaba autorizada.
+- Se configuró la compatibilidad para `siteID` y `token` explícitos de Netlify Blobs por medio de `process.env.NETLIFY_SITE_ID` y `process.env.NETLIFY_API_TOKEN` logrando persistencia total de la aplicación.
+- Se mejoró la UI de validación en `AdminDashboard.jsx`: 
+  - Errores críticos ahora se muestran en un modal superpuesto (Popup central) con opacidad.
+  - El mensaje de éxito ("Se guardó correctamente") se insertó al lado de cada botón y campo que se edita en vez de un bloque verde intrusivo en la parte superior.
+  - Se removieron dependencias muertas como `setMessage` que causaban bloqueos silenciosos ("trabado") al intentar guardar configuraciones en el frontend.
+- Backend: Se inyectaron Planes por defecto ("100 MB", "200 MB", "300 MB") en `configRepository.js` cuando el almacén de Blobs de Netlify se inicializa vacío, evitando tarjetas de planes rotas o ineditables en el administrador.
+- Frontend: Se reemplazó el "placeholder" del mapa de área de cobertura en `NosotrosScreen.jsx` por un mapa iframe interactivo de Google Maps de la ubicación de OriNet, con estilos 100% responsivos.
+
 ### Panel Administrador y Responsive UI (Fase 8)
 
 - Se diseñó e implementó visualmente el `AdminDashboard.jsx` siguiendo el lenguaje visual de OriNet (fondo oscuro, acentos en rojo y verde, estilo Mobile-First).
