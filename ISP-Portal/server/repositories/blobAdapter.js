@@ -11,7 +11,7 @@ if (typeof __dirname !== "undefined") {
 } else {
   _currentDirName = process.cwd();
 }
-const LOCAL_STORE_PATH = path.join(_currentDirName, "../../.local-blobs.json");
+let LOCAL_STORE_PATH = path.join(_currentDirName, "../../.local-blobs.json");
 
 /**
  * Adapter para manejar Netlify Blobs en producción
@@ -20,10 +20,12 @@ const LOCAL_STORE_PATH = path.join(_currentDirName, "../../.local-blobs.json");
 export class BlobAdapter {
   constructor(storeName) {
     this.storeName = storeName;
-    // Si estamos en Netlify (usualmente NETLIFY=true o hay context de blobs)
-    // O si estamos en entorno productivo o entorno AWS Lambda (Netlify Functions)
     const isLambda = !!process.env.AWS_EXECUTION_ENV || !!process.env.LAMBDA_TASK_ROOT || !!process.env.LAMBDA_RUNTIME_DIR;
     this.isLocal = !process.env.NETLIFY && !isLambda && process.env.NODE_ENV !== "production";
+    
+    if (isLambda) {
+       LOCAL_STORE_PATH = "/tmp/.local-blobs.json";
+    }
   }
 
   async _readLocalData() {
@@ -48,8 +50,18 @@ export class BlobAdapter {
       const storeData = data[this.storeName] || {};
       return storeData[key] || null;
     } else {
-      const store = getStore(this.storeName);
-      return await store.get(key, { type: "json" });
+      try {
+        const store = getStore(this.storeName);
+        return await store.get(key, { type: "json" });
+      } catch (err) {
+        if (err.name === 'MissingBlobsEnvironmentError' || err.message.includes('configured to use Netlify Blobs') || err.message.includes('No siteID')) {
+          console.warn("Netlify Blobs not configured, falling back to local /tmp filesystem");
+          const data = await this._readLocalData();
+          const storeData = data[this.storeName] || {};
+          return storeData[key] || null;
+        }
+        throw err;
+      }
     }
   }
 
@@ -62,8 +74,22 @@ export class BlobAdapter {
       data[this.storeName][key] = value;
       await this._writeLocalData(data);
     } else {
-      const store = getStore(this.storeName);
-      await store.setJSON(key, value);
+      try {
+        const store = getStore(this.storeName);
+        await store.setJSON(key, value);
+      } catch (err) {
+        if (err.name === 'MissingBlobsEnvironmentError' || err.message.includes('configured to use Netlify Blobs') || err.message.includes('No siteID')) {
+          console.warn("Netlify Blobs not configured, falling back to local /tmp filesystem");
+          const data = await this._readLocalData();
+          if (!data[this.storeName]) {
+            data[this.storeName] = {};
+          }
+          data[this.storeName][key] = value;
+          await this._writeLocalData(data);
+          return;
+        }
+        throw err;
+      }
     }
   }
 }

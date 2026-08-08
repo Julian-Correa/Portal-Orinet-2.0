@@ -34,20 +34,23 @@ export default function AdminDashboard({ session }) {
   const [editingCosto, setEditingCosto] = useState(null);
   const [tempCostoValue, setTempCostoValue] = useState("");
   const [savingCostos, setSavingCostos] = useState(false);
+  const [lastSavedCosto, setLastSavedCosto] = useState(null);
 
   // Popup State
   const [popup, setPopup] = useState({ enabled: false, imageUrl: "", linkUrl: "" });
   const [savingPopup, setSavingPopup] = useState(false);
   const [showPopupConfig, setShowPopupConfig] = useState(false);
+  const [lastSavedPopup, setLastSavedPopup] = useState(false);
 
   // Planes State
   const [planes, setPlanes] = useState([]);
   const [editingPlanId, setEditingPlanId] = useState(null);
   const [tempPlan, setTempPlan] = useState(null);
   const [savingPlanes, setSavingPlanes] = useState(false);
+  const [lastSavedPlanId, setLastSavedPlanId] = useState(null);
 
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+
 
   const adminCode = session?.code;
 
@@ -100,8 +103,8 @@ export default function AdminDashboard({ session }) {
       await adminApi.updateCostos(adminCode, newCostos);
       setCostos(newCostos);
       setEditingCosto(null);
-      setMessage("Configuración actualizada.");
-      setTimeout(() => setMessage(""), 3000);
+      setLastSavedCosto(key);
+      setTimeout(() => setLastSavedCosto(null), 3000);
     } catch (err) {
       setError("Error al guardar la configuración.");
       console.error(err);
@@ -116,6 +119,8 @@ export default function AdminDashboard({ session }) {
     setSavingPopup(true);
     try {
       await adminApi.updatePopup(adminCode, newPopup);
+      setLastSavedPopup(true);
+      setTimeout(() => setLastSavedPopup(false), 3000);
     } catch (err) {
       setError("Error al actualizar el estado del popup.");
       console.error(err);
@@ -143,8 +148,8 @@ export default function AdminDashboard({ session }) {
       await adminApi.updatePlanes(adminCode, updatedPlanes);
       setPlanes(updatedPlanes);
       setEditingPlanId(null);
-      setMessage("Plan actualizado.");
-      setTimeout(() => setMessage(""), 3000);
+      setLastSavedPlanId(tempPlan.id);
+      setTimeout(() => setLastSavedPlanId(null), 3000);
     } catch (err) {
       setError("Error al guardar el plan.");
       console.error(err);
@@ -175,15 +180,22 @@ export default function AdminDashboard({ session }) {
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-6 flex justify-between items-center animate-in fade-in slide-in-from-top-2">
-          <span>{error}</span>
-          <button className="text-xl leading-none hover:text-red-300 p-1" onClick={() => setError("")}>&times;</button>
-        </div>
-      )}
-
-      {message && (
-        <div className="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 px-4 py-3 rounded-lg mb-6 animate-in fade-in slide-in-from-top-2">
-          {message}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#151D2D] border border-red-500/50 rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-500 mb-4">
+              <svg className="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <h3 className="text-lg font-bold">Ocurrió un error</h3>
+            </div>
+            <p className="text-slate-300 text-sm mb-6">{error}</p>
+            <button 
+              onClick={() => setError("")}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg transition-colors"
+            >
+              Entendido
+            </button>
+          </div>
         </div>
       )}
 
@@ -237,7 +249,10 @@ export default function AdminDashboard({ session }) {
                   />
                 </div>
               ) : (
-                <p className="text-xl font-bold text-white">{formatCurrency(costos.recargoReconexion)}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xl font-bold text-white">{formatCurrency(costos.recargoReconexion)}</p>
+                  {lastSavedCosto === 'recargoReconexion' && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in">Se guardó correctamente</span>}
+                </div>
               )}
             </div>
             <div className="w-full sm:w-auto mt-2 sm:mt-0">
@@ -268,7 +283,10 @@ export default function AdminDashboard({ session }) {
                   />
                 </div>
               ) : (
-                <p className="text-xl font-bold text-white">{formatCurrency(costos.costoCompromiso)}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xl font-bold text-white">{formatCurrency(costos.costoCompromiso)}</p>
+                  {lastSavedCosto === 'costoCompromiso' && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in">Se guardó correctamente</span>}
+                </div>
               )}
             </div>
             <div className="w-full sm:w-auto mt-2 sm:mt-0">
@@ -299,7 +317,10 @@ export default function AdminDashboard({ session }) {
                   />
                 </div>
               ) : (
-                <p className="text-xl font-bold text-white">{formatCurrency(costos.umbralDeudaVencida)}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xl font-bold text-white">{formatCurrency(costos.umbralDeudaVencida)}</p>
+                  {lastSavedCosto === 'umbralDeudaVencida' && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in">Se guardó correctamente</span>}
+                </div>
               )}
             </div>
             <div className="w-full sm:w-auto mt-2 sm:mt-0">
@@ -324,6 +345,7 @@ export default function AdminDashboard({ session }) {
                 <span className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${popup.enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700/50 text-slate-400'}`}>
                   {popup.enabled ? "Activo" : "Inactivo"}
                 </span>
+                {lastSavedPopup && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in ml-2">Se guardó correctamente</span>}
               </div>
             </div>
             <div className="flex flex-row items-center justify-between w-full sm:w-auto gap-4">
@@ -370,8 +392,8 @@ export default function AdminDashboard({ session }) {
                     setSavingPopup(true);
                     try {
                       await adminApi.updatePopup(adminCode, popup);
-                      setMessage("Configuración de popup guardada.");
-                      setTimeout(() => setMessage(""), 3000);
+                      setLastSavedPopup(true);
+                      setTimeout(() => setLastSavedPopup(false), 3000);
                       setShowPopupConfig(false);
                     } catch {
                       setError("Error al guardar detalles de popup.");
@@ -465,7 +487,8 @@ export default function AdminDashboard({ session }) {
                       <p className="text-sm text-slate-300 break-words">"{plan.descripcion}"</p>
                     </div>
                   </div>
-                  <div className="w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
+                  <div className="w-full sm:w-auto shrink-0 mt-2 sm:mt-0 flex flex-col items-end gap-2">
+                    {lastSavedPlanId === plan.id && <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in">Se guardó correctamente</span>}
                     <button 
                       onClick={() => handleEditPlan(plan)}
                       className="w-full sm:w-auto text-red-400 hover:text-red-300 text-sm font-medium transition-colors bg-red-500/10 px-4 py-2 rounded-lg hover:bg-red-500/20 active:scale-95 min-h-[44px] flex justify-center items-center"
