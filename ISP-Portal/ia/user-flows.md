@@ -44,6 +44,20 @@
 1. Si `POPUP_CONFIG.enabled` es `true`, se muestra un modal con imagen.
 2. Se puede cerrar con click fuera, boton `x` o `Escape`.
 
+## Flujo 8: ingreso al panel administrador
+
+1. El usuario (administrador) ingresa en la pantalla de login un código especial (ej. predefinido en backend).
+2. El sistema detecta que el código corresponde a un administrador y genera una sesión con `isAdmin: true`.
+3. La UI redirecciona automáticamente a `/admin`.
+4. El navbar muestra el badge "Panel Administrador" y el dashboard carga métricas y configuraciones desde la API.
+
+## Flujo 9: edición de configuraciones (Admin)
+
+1. En el panel `/admin`, el administrador toca "Editar" en un costo o plan.
+2. El campo de texto se convierte en un input real-time con botones "Guardar" y "Cancelar".
+3. Al modificar y guardar, la UI envía un `PUT` a la API (`/admin/config/...`).
+4. Se muestra un Toast/Feedback verde de éxito y el valor se actualiza en pantalla sin recargar la página.
+
 ## Notas 2.0
 
 - Estos flujos representan el estado actual heredado de v1.

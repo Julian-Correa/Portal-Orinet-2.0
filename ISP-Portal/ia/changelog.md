@@ -1,3 +1,13 @@
+## 2026-08-08
+
+### Panel Administrador y Responsive UI (Fase 8)
+
+- Se diseñó e implementó visualmente el `AdminDashboard.jsx` siguiendo el lenguaje visual de OriNet (fondo oscuro, acentos en rojo y verde, estilo Mobile-First).
+- Se habilitó la edición *inline* real-time de Costos Generales (recargo, compromiso, 2do vencimiento) y Catálogo de Planes.
+- Se implementó un componente de Switch accesible para activar/desactivar el popup informativo.
+- Se corrigió un bug grave de diseño global causado por el reseteo CSS `* { margin: 0; padding: 0 }` que rompía utilidades de Tailwind v4 (`mx-auto`, `padding`). Se reubicó en `@layer base` respetando las reglas de especificidad de CSS nativo.
+- Se hicieron ajustes responsive avanzados (botones w-full, targets de 44px) para dispositivos de 320px-375px.
+
 ## 2026-07-21
 
 ### Documentacion IA inicial

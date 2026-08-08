@@ -5,10 +5,15 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 ### Componentes existentes
 
 - `ErrorBoundary`: fallback si la UI crashea.
+- `MainLayout`: Wrapper global con fondo, layout y rutas.
+- `Navbar`: Barra de navegación con logo y enlaces contextuales (cliente o admin).
 - `PopupImage`: popup opcional de comunicacion visual.
 - `LoginScreen`: ingreso por DNI y primer fetch al backend.
+- `AdminDashboard`: Panel administrativo con configuración de costos, métricas y planes.
 - `ProfileScreen`: dashboard principal del cliente.
+- `PlanesScreen`, `ServiciosScreen`, `FacturacionScreen`, `NosotrosScreen`: Vistas secundarias modulares.
 - `EmailCard`: alta/edicion del email de facturacion.
+- `Switch` (dentro de AdminDashboard): toggle accesible para configuraciones.
 - `OriNetLogo`: logo presentacional.
 - `DownloadIcon`, `LogoutIcon`, `WhatsAppIcon`: iconos presentacionales.
 
