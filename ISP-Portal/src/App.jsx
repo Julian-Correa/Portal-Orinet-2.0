@@ -13,6 +13,7 @@ import NosotrosScreen from "./components/screens/NosotrosScreen.jsx";
 import FacturacionScreen from "./components/screens/FacturacionScreen.jsx";
 import ServiciosScreen from "./components/screens/ServiciosScreen.jsx";
 import PlanesScreen from "./components/screens/PlanesScreen.jsx";
+import CompromisosScreen from "./components/screens/CompromisosScreen.jsx";
 const PlaceholderScreen = ({ title }) => (
   <div className="bg-white p-8 rounded shadow text-center">
     <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
@@ -73,7 +74,7 @@ export default function App() {
               <Route path="/facturacion" element={<FacturacionScreen customer={session.customer} invoiceUrl={session.invoiceUrl} />} />
               <Route path="/servicios" element={<ServiciosScreen customer={session.customer} planInfo={session.planInfo} />} />
               <Route path="/planes" element={<PlanesScreen customer={session.customer} />} />
-              <Route path="/compromisos" element={<PlaceholderScreen title="Compromisos de Pago" />} />
+              <Route path="/compromisos" element={<CompromisosScreen customer={session.customer} />} />
               <Route path="/nosotros" element={<NosotrosScreen />} />
               
               {/* Fallback */}

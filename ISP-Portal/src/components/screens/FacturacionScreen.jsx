@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import DownloadIcon from "../icons/DownloadIcon.jsx";
 
 export default function FacturacionScreen({ customer, invoiceUrl }) {
@@ -8,7 +9,7 @@ export default function FacturacionScreen({ customer, invoiceUrl }) {
         <h1 className="text-3xl font-bold text-white mb-2">Facturación</h1>
         <p className="text-slate-400 mb-8">Descargá tus comprobantes de pago y facturas emitidas.</p>
 
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center">
+        <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-center mb-6">
           <p className="text-lg text-white font-medium mb-1">Última factura generada</p>
           <p className="text-sm text-slate-400 mb-6">Nº de cliente: {customer?.code}</p>
           
@@ -33,6 +34,19 @@ export default function FacturacionScreen({ customer, invoiceUrl }) {
               </p>
             </div>
           )}
+        </div>
+
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6 text-center">
+          <h3 className="text-lg text-blue-100 font-bold mb-2">¿Necesitás más tiempo para abonar?</h3>
+          <p className="text-sm text-slate-300 mb-4">
+            Podés solicitar una prórroga para el pago de tu factura dentro de las fechas permitidas.
+          </p>
+          <Link 
+            to="/compromisos" 
+            className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+          >
+            Solicitar Compromiso de Pago
+          </Link>
         </div>
       </div>
     </div>

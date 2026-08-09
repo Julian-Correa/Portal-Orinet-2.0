@@ -54,11 +54,11 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 - [x] 7.4 Botón "Solicitar" con generación dinámica de mensaje de WhatsApp.
 
 ## 8. Compromisos de Pago
-- [ ] 8.1 Crear función utilitaria para cálculo de ventana de fechas (con Unit Tests en Vitest).
-- [ ] 8.2 Crear vista `/compromisos`.
-- [ ] 8.3 Implementar lógica para cuentas bloqueadas (Días 26/27, mensajes especiales).
-- [ ] 8.4 Integrar Datepicker limitando fechas pasadas (`max(hoy, inicio_ventana)`).
-- [ ] 8.5 Generar mensajes de WhatsApp dinámicos según estado de cuenta.
+- [x] 8.1 Crear función utilitaria para cálculo de ventana de fechas (con Unit Tests en Vitest).
+- [x] 8.2 Crear vista `/compromisos`.
+- [x] 8.3 Implementar lógica para cuentas bloqueadas (Días 26/27, mensajes especiales).
+- [x] 8.4 Integrar Datepicker limitando fechas pasadas (`max(hoy, inicio_ventana)`).
+- [x] 8.5 Generar mensajes de WhatsApp dinámicos según estado de cuenta.
 
 ## Handoff / Notas para la próxima sesión
 - **ISSUE Pendiente:** El cliente informa que se agregó un "extra" a la cuenta DNI 44129435 en ISPCube, pero no se refleja en el portal.
