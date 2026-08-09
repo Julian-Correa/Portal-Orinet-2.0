@@ -59,6 +59,7 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 - [x] 8.3 Implementar lógica para cuentas bloqueadas (Días 26/27, mensajes especiales).
 - [x] 8.4 Integrar Datepicker limitando fechas pasadas (`max(hoy, inicio_ventana)`).
 - [x] 8.5 Generar mensajes de WhatsApp dinámicos según estado de cuenta.
+- [x] 8.6 QA Mobile: Validación estricta JS en el datepicker (por bypass nativo en iOS/Android), fix redirect de `WHATSAPP_URL` y testing UI responsive con Playwright.
 
 ## Handoff / Notas para la próxima sesión
 - **ISSUE Pendiente:** El cliente informa que se agregó un "extra" a la cuenta DNI 44129435 en ISPCube, pero no se refleja en el portal.
