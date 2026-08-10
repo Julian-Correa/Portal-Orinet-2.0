@@ -24,14 +24,15 @@ function createDependencies() {
     contact_emails: [{ id: 12, email: "ada@example.com", principal: 1 }],
   };
 
-  const ispRepository = {
-    findConnectionByCustomer: vi.fn().mockResolvedValue({ plan_id: 99 }),
-    findCustomerByDni: vi.fn().mockResolvedValue(customer),
-    findLastInvoiceUrl: vi.fn().mockResolvedValue("https://example.com/factura.pdf"),
-    findPlanById: vi.fn().mockResolvedValue({ id: 99, name: "300 MB", price: 12345 }),
-    getToken: vi.fn().mockResolvedValue("token-1"),
-    updateCustomerEmail: vi.fn().mockResolvedValue(true),
-  };
+    const ispRepository = {
+      findConnectionByCustomer: vi.fn().mockResolvedValue({ plan_id: 99 }),
+      findCustomerByDni: vi.fn().mockResolvedValue(customer),
+      findLastInvoiceUrl: vi.fn().mockResolvedValue("https://example.com/factura.pdf"),
+      findPlanById: vi.fn().mockResolvedValue({ id: 99, name: "300 MB", price: 12345 }),
+      getToken: vi.fn().mockResolvedValue("token-1"),
+      updateCustomerEmail: vi.fn().mockResolvedValue(true),
+      findActiveExtras: vi.fn().mockResolvedValue([]),
+    };
 
   const service = new CustomerSummaryService({
     cache,

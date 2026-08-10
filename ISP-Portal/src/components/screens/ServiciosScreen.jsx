@@ -3,13 +3,15 @@ import WhatsAppIcon from "../icons/WhatsAppIcon.jsx";
 import { WHATSAPP_SOPORTE_URL } from "../../lib/config/portalConfig.js";
 import { formatName } from "../../lib/utils/format.js";
 
-export default function ServiciosScreen({ planInfo, customer }) {
+export default function ServiciosScreen({ planInfo, customer, extras = [] }) {
   // Extraemos los extra del cliente (vienen en crudo de ISPCube)
-  const extras = [
+  const legacyExtras = [
     customer?.extra1,
     customer?.extra2,
     customer?.extra3
-  ].filter(extra => extra && extra.trim() !== "");
+  ].filter(extra => extra && typeof extra === 'string' && extra.trim() !== "").map(e => ({ description: e }));
+
+  const allExtras = [...(extras || []), ...legacyExtras];
 
   const soporteMsg = customer ? `Hola, soy ${formatName(customer.name)}, DNI ${customer.doc_number}, código de cliente ${customer.code}, domicilio ${customer.address}. Estoy comunicándome para reportar que no cuento con servicio de internet y solicitar asistencia técnica.` : "";
 
@@ -40,12 +42,19 @@ export default function ServiciosScreen({ planInfo, customer }) {
             <span>📦</span> Servicios Adicionales (Extras)
           </h2>
           
-          {extras.length > 0 ? (
+          {allExtras.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {extras.map((extra, index) => (
-                <div key={index} className="bg-black/20 rounded-lg p-4 border border-white/5 flex items-start gap-3">
-                  <span className="text-[#38bdf8] text-xl mt-0.5">✧</span>
-                  <p className="text-slate-200 font-medium leading-relaxed">{extra}</p>
+              {allExtras.map((extra, index) => (
+                <div key={index} className="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-start gap-1">
+                  <div className="flex items-center gap-2 w-full">
+                    <span className="text-[#38bdf8] text-xl">✧</span>
+                    <p className="text-slate-200 font-medium leading-relaxed flex-1">{extra.description}</p>
+                  </div>
+                  {extra.price && (
+                    <p className="text-sm font-bold text-[#10b981] ml-6">
+                      ${parseFloat(extra.price).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

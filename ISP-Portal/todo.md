@@ -62,10 +62,11 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 - [x] 8.6 QA Mobile: Validación estricta JS en el datepicker (por bypass nativo en iOS/Android), fix redirect de `WHATSAPP_URL` y testing UI responsive con Playwright.
 
 ## Handoff / Notas para la próxima sesión
-- **ISSUE Pendiente:** El cliente informa que se agregó un "extra" a la cuenta DNI 44129435 en ISPCube, pero no se refleja en el portal.
-- **Investigación:**
-  - Se probó mapear los campos `extra1`, `extra2`, `extra3` del modelo cliente de ISPCube, pero la API oficial los devuelve como `null`.
-  - Se probó mapear la llave `extraplans` de la conexión del cliente, pero la API la devuelve como un array vacío `[]`.
-  - Se probó mapear `extra_pack_name` de la conexión, que también devolvió `null`.
-  - El código que se intentó usar para mostrarlos fue revertido a su estado original (commit `0f9a8a5`).
-- **Próximos pasos a seguir:** Preguntar al usuario en qué pantalla/módulo exacto de ISPCube se dio de alta el extra (Facturación como "artículo extra", como "Plan Extra" desde conexión, etc.) para identificar a qué endpoint de ISPCube hay que apuntar para conseguir esa información, ya que los endpoints `/customer` y `/connection` estándar no lo están incluyendo.
+- [x] **ISSUE Pendiente Resuelto:** El cliente informaba que se agregó un "extra" a la cuenta DNI 44129435 en ISPCube (APP TV $9000), pero no se reflejaba en el portal.
+- **Solución implementada:**
+  - Se descubrió que ISPCube no expone los "Artículos Extra" directamente en los endpoints `/customer` ni `/connection` (los campos `extra1`, `extra2`, `extraplans` venían vacíos o null).
+  - Al cargarlos como "Artículos extra en facturación", ISPCube genera facturas (Bills) por estos conceptos.
+  - Se implementó `findActiveExtras` en `ispRepository.js` para consultar `/bills/bills_list`, filtrando facturas recientes/impagas y extrayendo los items que no sean el abono de internet (`plan_id === null` y tengan `extra_id`).
+  - Se actualizó el backend, la caché de sesión y la vista `/servicios` para mostrar dinámicamente estos extras facturados junto a su precio correspondiente.
+
+(Fin del scope actual. Portal versión estable con Compromisos de Pago y Extras integrados.)

@@ -133,6 +133,66 @@ export class IspRepository {
     return null;
   }
 
+  async findActiveExtras(customerId, token) {
+    if (!customerId) return [];
+    
+    try {
+      const response = await this.request(`${this.isp.apiBase}/bills/bills_list?customer_id=${customerId}`, {
+        headers: this.headers(token),
+      });
+
+      if (!response.ok) return [];
+
+      const bills = await this.readJson(response, "bills/bills_list");
+      if (!Array.isArray(bills)) return [];
+
+      // Filtrar facturas recientes o impagas
+      const now = new Date();
+      const recentBills = bills.filter(bill => {
+        if (bill.canceled === 1) return false;
+        // Solo tomar facturas de tipo invoice/FB
+        if (bill.internal_type === "surcharge") return false;
+        
+        // Consideramos "activo" si la factura se genero en los ultimos 60 dias o sigue impaga
+        const billDate = new Date(bill.date);
+        const diffDays = (now - billDate) / (1000 * 60 * 60 * 24);
+        const hasDebt = parseFloat(bill.customer_debt || 0) > 0;
+        
+        return diffDays <= 60 || hasDebt;
+      });
+
+      const extrasMap = new Map();
+
+      // Recorrer las facturas de más reciente a más antigua
+      recentBills.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      for (const bill of recentBills) {
+        if (!Array.isArray(bill.items)) continue;
+
+        for (const item of bill.items) {
+          // Si tiene plan_id es internet, si tiene surcharge_id es recargo,
+          // si tiene afip_code tal vez sea un cargo fijo impositivo.
+          // Nos interesan los que tienen extra_id o no tienen plan.
+          if (!item.plan_id && !item.surcharge_id && item.description) {
+            // Evitamos duplicados mostrando solo el más reciente
+            const desc = item.description.trim();
+            if (!extrasMap.has(desc)) {
+              extrasMap.set(desc, {
+                description: desc,
+                price: item.total
+              });
+            }
+          }
+        }
+      }
+
+      return Array.from(extrasMap.values());
+    } catch (error) {
+      this.warn("isp_optional_extras_failed", { customerId, message: error.message });
+      return [];
+    }
+  }
+
   async findConnectionByCustomer(customer, token) {
     const searches = [
       { customer_id: String(customer.id) },

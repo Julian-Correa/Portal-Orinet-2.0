@@ -72,7 +72,7 @@ export default function App() {
                 } 
               />
               <Route path="/facturacion" element={<FacturacionScreen customer={session.customer} invoiceUrl={session.invoiceUrl} />} />
-              <Route path="/servicios" element={<ServiciosScreen customer={session.customer} planInfo={session.planInfo} />} />
+              <Route path="/servicios" element={<ServiciosScreen customer={session.customer} planInfo={session.planInfo} extras={session.extras} />} />
               <Route path="/planes" element={<PlanesScreen customer={session.customer} />} />
               <Route path="/compromisos" element={<CompromisosScreen customer={session.customer} />} />
               <Route path="/nosotros" element={<NosotrosScreen />} />
