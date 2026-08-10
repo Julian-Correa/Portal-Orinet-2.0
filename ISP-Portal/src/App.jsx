@@ -7,6 +7,7 @@ import LoginScreen from "./components/screens/LoginScreen.jsx";
 import ProfileScreen from "./components/screens/ProfileScreen.jsx";
 import MainLayout from "./components/layout/MainLayout.jsx";
 import AdminDashboard from "./components/screens/AdminDashboard.jsx";
+import NotFoundScreen from "./components/screens/NotFoundScreen.jsx";
 import { POPUP_CONFIG } from "./lib/config/portalConfig.js";
 
 import NosotrosScreen from "./components/screens/NosotrosScreen.jsx";
@@ -49,7 +50,6 @@ export default function App() {
           {session?.isAdmin && (
             <>
               <Route path="/admin" element={<AdminDashboard session={session} />} />
-              <Route path="*" element={<Navigate to="/admin" replace />} />
             </>
           )}
 
@@ -67,7 +67,7 @@ export default function App() {
                     recargoReconexion={session.recargoReconexion}
                     recargoSegundoVencimiento={session.recargoSegundoVencimiento}
                     onUpdateCustomer={updateCustomer}
-                    onLogout={logout} // Not strictly needed in ProfileScreen anymore if it's in Navbar, but kept for compatibility
+                    onLogout={logout} 
                   />
                 } 
               />
@@ -76,12 +76,12 @@ export default function App() {
               <Route path="/planes" element={<PlanesScreen customer={session.customer} />} />
               <Route path="/compromisos" element={<CompromisosScreen customer={session.customer} />} />
               <Route path="/nosotros" element={<NosotrosScreen />} />
-              
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/perfil" replace />} />
             </>
           )}
         </Route>
+
+        {/* 404 Fallback Route */}
+        <Route path="*" element={<NotFoundScreen />} />
       </Routes>
     </ErrorBoundary>
   );
