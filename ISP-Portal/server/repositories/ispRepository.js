@@ -146,9 +146,12 @@ export class IspRepository {
       const bills = await this.readJson(response, "bills/bills_list");
       if (!Array.isArray(bills)) return [];
 
-      // Filtrar facturas recientes o impagas
+      // Filtrar facturas del cliente especifico que esten recientes o impagas
       const now = new Date();
       const recentBills = bills.filter(bill => {
+        // MUY IMPORTANTE: ISPCube devuelve facturas globales a veces, hay que filtrar por cliente
+        if (String(bill.customer_id) !== String(customerId)) return false;
+        
         if (bill.canceled === 1) return false;
         // Solo tomar facturas de tipo invoice/FB
         if (bill.internal_type === "surcharge") return false;
