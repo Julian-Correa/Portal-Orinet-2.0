@@ -146,42 +146,42 @@ export class IspRepository {
       const bills = await this.readJson(response, "bills/bills_list");
       if (!Array.isArray(bills)) return [];
 
-      // Filtrar facturas del cliente especifico que esten recientes o impagas
-      const now = new Date();
-      const recentBills = bills.filter(bill => {
-        // MUY IMPORTANTE: ISPCube devuelve facturas globales a veces, hay que filtrar por cliente
+      // Facturas del cliente
+      const customerBills = bills.filter(bill => {
         if (String(bill.customer_id) !== String(customerId)) return false;
-        
         if (bill.canceled === 1) return false;
-        // Solo tomar facturas de tipo invoice/FB
         if (bill.internal_type === "surcharge") return false;
-        
-        // Consideramos "activo" si la factura se genero en los ultimos 60 dias o sigue impaga
-        const billDate = new Date(bill.date);
-        const diffDays = (now - billDate) / (1000 * 60 * 60 * 24);
-        const hasDebt = parseFloat(bill.customer_debt || 0) > 0;
-        
-        return diffDays <= 60 || hasDebt;
+        return true;
       });
 
+      if (customerBills.length === 0) return [];
+
+      // Encontrar la fecha de facturación más reciente para determinar el "mes actual"
+      const maxDateMs = Math.max(...customerBills.map(b => new Date(b.date).getTime()));
+      
+      // Filtrar facturas que correspondan a este último ciclo (margen de 15 días por si se facturan extras en días separados)
+      const currentCycleBills = customerBills.filter(b => {
+        const diffDays = (maxDateMs - new Date(b.date).getTime()) / (1000 * 60 * 60 * 24);
+        return diffDays <= 15;
+      });
+
+      const allowedExtras = ["app tv", "router quemado", "conector"];
       const extrasMap = new Map();
 
-      // Recorrer las facturas de más reciente a más antigua
-      recentBills.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      for (const bill of recentBills) {
+      for (const bill of currentCycleBills) {
         if (!Array.isArray(bill.items)) continue;
 
         for (const item of bill.items) {
-          // Si tiene plan_id es internet, si tiene surcharge_id es recargo,
-          // si tiene afip_code tal vez sea un cargo fijo impositivo.
-          // Nos interesan los que tienen extra_id o no tienen plan.
-          if (!item.plan_id && !item.surcharge_id && item.description) {
-            // Evitamos duplicados mostrando solo el más reciente
-            const desc = item.description.trim();
-            if (!extrasMap.has(desc)) {
-              extrasMap.set(desc, {
-                description: desc,
+          if (!item.description) continue;
+
+          const descLower = item.description.toLowerCase();
+          const isAllowed = allowedExtras.some(allowed => descLower.includes(allowed));
+
+          if (isAllowed && !item.plan_id && !item.surcharge_id) {
+            const originalDesc = item.description.trim();
+            if (!extrasMap.has(originalDesc)) {
+              extrasMap.set(originalDesc, {
+                description: originalDesc,
                 price: item.total
               });
             }
