@@ -20,6 +20,7 @@ Campos consumidos o expuestos por la UI/backend:
 - `debt`
 - `duedebt`
 - `status`
+- `block_date` (usado para control de deudores antiguos)
 - `city.name`
 - `city.province`
 - `phones[0].number`
@@ -73,5 +74,7 @@ Dato auxiliar del proveedor. Se usan sobre todo:
 
 ## Notas 2.0
 
-- El summary payload ahora incluye `recargoReconexion`, `recargoSegundoVencimiento` y `cutDay` (agregados en v1 final).
+- El summary payload ahora incluye:
+  - `recargoReconexion`, `recargoSegundoVencimiento` y `cutDay` (agregados en v1 final).
+  - `extras`: Array extraído de `/bills/bills_list` con objetos estructurados como `{ description: "APP TV", price: "9000.00" }`.
 - Si se agregan nuevas funcionalidades que requieran persistencia propia, documentar el modelo aqui.

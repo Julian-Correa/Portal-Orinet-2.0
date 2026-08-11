@@ -1,3 +1,22 @@
+## 2026-08-10
+
+### Funcionalidades PWA, UX Avanzada y Reglas de Negocio (Fases Finales)
+
+- **Instalación PWA:** Integración de `vite-plugin-pwa`. La aplicación ahora soporta manifiesto y service workers, siendo instalable como App Nativa en iOS/Android y Escritorio.
+- **Redirección SPA y 404:** Se agregó la regla `/* /index.html 200` en `netlify.toml` para solucionar errores 404 al recargar pantallas. Se creó una página visual `NotFoundScreen` para rutas inexistentes con botón de redirección al inicio.
+- **Servicios Adicionales (APP TV):**
+  - La API ahora lee los ítems extra facturados directamente consultando `/bills/bills_list` (ISPCube ignora el `customer_id` en el querystring, por lo que el filtrado se hace en el backend).
+  - Solo se extraen extras del "mes actual" (fecha máxima de facturación de los últimos 15 días) y se filtra por palabras clave como `"app tv"`, `"router"` o `"conector"`.
+  - Se agregaron los planes "APP TV 2 Pantallas ($9000)" y "APP TV 3 Pantallas ($11000)" al catálogo por defecto.
+- **Rediseño de Catálogo de Planes:** Las tarjetas (cards) ahora le dan protagonismo en tamaño `text-5xl` a la velocidad o característica principal (ej. "2 PANTALLAS"). Los mensajes de WhatsApp ahora incluyen dinámicamente la descripción del plan.
+- **UX UI Skeletons & Transitions:**
+  - Se añadió `framer-motion` y un wrapper `<PageTransition />` para brindar transiciones fluidas entre pantallas de la SPA.
+  - Reemplazo de spinners redondos por "Skeleton Loaders" animados en `AdminDashboard` y `PlanesScreen`.
+  - Fix CSS (Tailwind) en el datepicker de `CompromisosScreen` usando `min-w-0` y `appearance-none` para evitar desbordamientos nativos en navegadores móviles.
+- **Deudores Antiguos (Compromisos):**
+  - Se extrae el `block_date` del backend. Si el cliente está bloqueado y el mes/año de bloqueo es **anterior al mes actual**, no se le permite solicitar compromiso de pago los días 26/27. 
+  - Se despliega un botón especial hacia WhatsApp con el mensaje: "Hola OriNet soy... y quiero restablecer mi servicio con DEUDA."
+
 ## 2026-08-08
 
 ### Mejoras de Arquitectura, UI Administrador y Secciones (Fase 8)
