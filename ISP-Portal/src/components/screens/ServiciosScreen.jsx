@@ -1,5 +1,6 @@
 import React from "react";
 import WhatsAppIcon from "../icons/WhatsAppIcon.jsx";
+import PageTransition from "../layout/PageTransition.jsx";
 import { WHATSAPP_SOPORTE_URL } from "../../lib/config/portalConfig.js";
 import { formatName } from "../../lib/utils/format.js";
 
@@ -16,8 +17,9 @@ export default function ServiciosScreen({ planInfo, customer, extras = [] }) {
   const soporteMsg = customer ? `Hola, soy ${formatName(customer.name)}, DNI ${customer.doc_number}, código de cliente ${customer.code}, domicilio ${customer.address}. Estoy comunicándome para reportar que no cuento con servicio de internet y solicitar asistencia técnica.` : "";
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-[fadeUp_0.4s_ease]">
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl mb-6">
+    <PageTransition>
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl mb-6">
         <h1 className="text-3xl font-bold text-white mb-2">Mis Servicios</h1>
         <p className="text-slate-400 mb-8">Detalle de tu plan actual y servicios adicionales contratados.</p>
 
@@ -91,5 +93,6 @@ export default function ServiciosScreen({ planInfo, customer, extras = [] }) {
 
       </div>
     </div>
+    </PageTransition>
   );
 }

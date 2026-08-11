@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { adminApi } from "../../lib/api/adminApi.js";
+import PageTransition from "../layout/PageTransition.jsx";
 
 // Reusable Switch Component
 const Switch = ({ checked, onChange, disabled }) => (
@@ -162,14 +163,23 @@ export default function AdminDashboard({ session }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64 text-white">
-        <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <PageTransition>
+        <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col gap-6">
+            <div className="h-24 bg-white/5 border border-white/10 rounded-2xl animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white/5 border border-white/10 rounded-xl animate-pulse"></div>)}
+            </div>
+            <div className="h-96 bg-white/5 border border-white/10 rounded-2xl animate-pulse"></div>
+          </div>
+        </div>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 text-gray-100 font-sans w-full">
+    <PageTransition>
+      <div className="max-w-4xl mx-auto px-4 py-8 text-gray-100 font-sans w-full">
       
       {/* 1. HEADER ADMINISTRADOR */}
       <div className="mb-8">
@@ -502,5 +512,6 @@ export default function AdminDashboard({ session }) {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

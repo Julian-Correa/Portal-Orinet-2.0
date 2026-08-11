@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PageTransition from "../layout/PageTransition.jsx";
 
 import WhatsAppIcon from "../icons/WhatsAppIcon.jsx";
 import EmailCard from "../profile/EmailCard.jsx";
@@ -47,12 +48,13 @@ export default function ProfileScreen({
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "'Outfit', sans-serif",
-      }}
-    >
-      <div className="profile-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 28px 60px" }}>
+    <PageTransition>
+      <div
+        style={{
+          fontFamily: "'Outfit', sans-serif",
+        }}
+      >
+        <div className="profile-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 28px 60px" }}>
         <div style={{ marginBottom: 28, animation: "fadeUp 0.4s ease" }}>
           <p style={{ margin: "0 0 2px", color: "#cbd5e1", fontSize: 14 }}>Bienvenido/a,</p>
           <h2 style={{ margin: 0, color: "#f8fafc", fontSize: 28, fontWeight: 800, letterSpacing: "-0.5px" }}>
@@ -469,6 +471,7 @@ export default function ProfileScreen({
           .status-card > div:last-child { text-align: left !important; }
         }
       `}</style>
-    </div>
+      </div>
+    </PageTransition>
   );
 }

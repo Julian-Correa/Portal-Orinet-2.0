@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { WHATSAPP_URL } from "../../lib/config/portalConfig";
 import WhatsAppIcon from "../icons/WhatsAppIcon";
+import PageTransition from "../layout/PageTransition.jsx";
 import { formatName } from "../../lib/utils/format";
 import { getServiceStatus } from "../../lib/utils/customer";
 import { calculateCompromisoWindow, isSuspendedCompromisoAllowed } from "../../lib/utils/compromisos";
@@ -42,8 +43,9 @@ export default function CompromisosScreen({ customer }) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 animate-[fadeUp_0.4s_ease] mb-20 md:mb-0">
-      <div className="text-center mb-6 sm:mb-10">
+    <PageTransition>
+      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 mb-20 md:mb-0">
+        <div className="text-center mb-6 sm:mb-10">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3 sm:mb-4 tracking-tight">Compromiso de Pago</h1>
         <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto px-2">
           Solicitá una prórroga para el pago de tu factura.
@@ -77,15 +79,16 @@ export default function CompromisosScreen({ customer }) {
               <label htmlFor="compromise-date" className="block text-sm font-medium text-slate-300 mb-2">
                 ¿Qué día te comprometes a pagar?
               </label>
-              <input
-                type="date"
-                id="compromise-date"
-                value={selectedDate}
-                min={minDate}
-                max={maxDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all"
-              />
+                <input
+                  type="date"
+                  id="compromise-date"
+                  value={selectedDate}
+                  min={minDate}
+                  max={maxDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full max-w-full min-w-0 bg-slate-800/50 border border-slate-600 text-white rounded-xl px-3 sm:px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#38bdf8] focus:border-transparent transition-all appearance-none"
+                  style={{ display: "block" }}
+                />
               <p className="mt-2 text-xs text-slate-400">
                 Seleccioná una fecha válida dentro del rango permitido.
               </p>
@@ -119,5 +122,6 @@ export default function CompromisosScreen({ customer }) {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 }

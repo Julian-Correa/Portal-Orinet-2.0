@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PageTransition from "../layout/PageTransition.jsx";
 
 import WhatsAppIcon from "../icons/WhatsAppIcon.jsx";
 import OriNetLogo from "../layout/OriNetLogo.jsx";
@@ -43,7 +44,8 @@ export default function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div
+    <PageTransition>
+      <div
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -219,6 +221,7 @@ export default function LoginScreen({ onLogin }) {
           .login-logo-wrap svg { width: 240px !important; height: auto !important; }
         }
       `}</style>
-    </div>
+      </div>
+    </PageTransition>
   );
 }

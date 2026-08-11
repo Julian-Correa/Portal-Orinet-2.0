@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DownloadIcon from "../icons/DownloadIcon.jsx";
+import PageTransition from "../layout/PageTransition.jsx";
 
 export default function FacturacionScreen({ customer, invoiceUrl }) {
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 animate-[fadeUp_0.4s_ease]">
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+    <PageTransition>
+      <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
         <h1 className="text-3xl font-bold text-white mb-2">Facturación</h1>
         <p className="text-slate-400 mb-8">Descargá tus comprobantes de pago y facturas emitidas.</p>
 
@@ -50,5 +52,6 @@ export default function FacturacionScreen({ customer, invoiceUrl }) {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

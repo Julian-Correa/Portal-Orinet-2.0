@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PageTransition from '../layout/PageTransition.jsx';
 
 export default function NotFoundScreen() {
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
+    <PageTransition>
+      <div 
+        className="min-h-screen flex items-center justify-center p-4"
       style={{
         background: "linear-gradient(160deg, #0a0f1e 0%, #0d2240 55%, #0a1a35 100%)",
         fontFamily: "'Outfit', sans-serif",
@@ -24,5 +26,6 @@ export default function NotFoundScreen() {
         </Link>
       </div>
     </div>
+    </PageTransition>
   );
 }

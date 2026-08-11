@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { useCustomerSession } from "./hooks/useCustomerSession.js";
 
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
@@ -24,65 +25,68 @@ const PlaceholderScreen = ({ title }) => (
 
 export default function App() {
   const { session, setSession, updateCustomer, logout } = useCustomerSession();
+  const location = useLocation();
 
   return (
     <ErrorBoundary>
       {/* Global Popup if session exists and is not admin */}
       {session && !session.isAdmin && <PopupImage config={POPUP_CONFIG} />}
       
-      <Routes>
-        {/* Public Route */}
-        <Route 
-          path="/" 
-          element={
-            session ? (
-              <Navigate to={session.isAdmin ? "/admin" : "/perfil"} replace />
-            ) : (
-              <LoginScreen onLogin={setSession} />
-            )
-          } 
-        />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Public Route */}
+          <Route 
+            path="/" 
+            element={
+              session ? (
+                <Navigate to={session.isAdmin ? "/admin" : "/perfil"} replace />
+              ) : (
+                <LoginScreen onLogin={setSession} />
+              )
+            } 
+          />
 
-        {/* Protected Routes */}
-        <Route element={<MainLayout session={session} onLogout={logout} />}>
-          
-          {/* Admin Routes */}
-          {session?.isAdmin && (
-            <>
-              <Route path="/admin" element={<AdminDashboard session={session} />} />
-            </>
-          )}
+          {/* Protected Routes */}
+          <Route element={<MainLayout session={session} onLogout={logout} />}>
+            
+            {/* Admin Routes */}
+            {session?.isAdmin && (
+              <>
+                <Route path="/admin" element={<AdminDashboard session={session} />} />
+              </>
+            )}
 
-          {/* Customer Routes */}
-          {session && !session.isAdmin && (
-            <>
-              <Route 
-                path="/perfil" 
-                element={
-                  <ProfileScreen
-                    customer={session.customer}
-                    cutDay={session.cutDay}
-                    invoiceUrl={session.invoiceUrl}
-                    planInfo={session.planInfo}
-                    recargoReconexion={session.recargoReconexion}
-                    recargoSegundoVencimiento={session.recargoSegundoVencimiento}
-                    onUpdateCustomer={updateCustomer}
-                    onLogout={logout} 
-                  />
-                } 
-              />
-              <Route path="/facturacion" element={<FacturacionScreen customer={session.customer} invoiceUrl={session.invoiceUrl} />} />
-              <Route path="/servicios" element={<ServiciosScreen customer={session.customer} planInfo={session.planInfo} extras={session.extras} />} />
-              <Route path="/planes" element={<PlanesScreen customer={session.customer} />} />
-              <Route path="/compromisos" element={<CompromisosScreen customer={session.customer} />} />
-              <Route path="/nosotros" element={<NosotrosScreen />} />
-            </>
-          )}
-        </Route>
+            {/* Customer Routes */}
+            {session && !session.isAdmin && (
+              <>
+                <Route 
+                  path="/perfil" 
+                  element={
+                    <ProfileScreen
+                      customer={session.customer}
+                      cutDay={session.cutDay}
+                      invoiceUrl={session.invoiceUrl}
+                      planInfo={session.planInfo}
+                      recargoReconexion={session.recargoReconexion}
+                      recargoSegundoVencimiento={session.recargoSegundoVencimiento}
+                      onUpdateCustomer={updateCustomer}
+                      onLogout={logout} 
+                    />
+                  } 
+                />
+                <Route path="/facturacion" element={<FacturacionScreen customer={session.customer} invoiceUrl={session.invoiceUrl} />} />
+                <Route path="/servicios" element={<ServiciosScreen customer={session.customer} planInfo={session.planInfo} extras={session.extras} />} />
+                <Route path="/planes" element={<PlanesScreen customer={session.customer} />} />
+                <Route path="/compromisos" element={<CompromisosScreen customer={session.customer} />} />
+                <Route path="/nosotros" element={<NosotrosScreen />} />
+              </>
+            )}
+          </Route>
 
-        {/* 404 Fallback Route */}
-        <Route path="*" element={<NotFoundScreen />} />
-      </Routes>
+          {/* 404 Fallback Route */}
+          <Route path="*" element={<NotFoundScreen />} />
+        </Routes>
+      </AnimatePresence>
     </ErrorBoundary>
   );
 }
