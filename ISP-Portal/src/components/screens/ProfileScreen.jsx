@@ -28,6 +28,7 @@ export default function ProfileScreen({
   const shouldAddSurcharge = isSecondDueDateWindow && !hasBilledSurcharge;
   
   const totalDebt = debt + recargo + (shouldAddSurcharge ? recargoSegundoVencimiento : 0);
+  const hasDebt = totalDebt > 0;
 
   const hasSurchargeBreakdown = recargo > 0 || shouldAddSurcharge;
 
