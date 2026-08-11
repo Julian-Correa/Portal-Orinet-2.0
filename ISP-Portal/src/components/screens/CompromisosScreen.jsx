@@ -26,7 +26,7 @@ export default function CompromisosScreen({ customer }) {
     }
   }
 
-  const windowInfo = calculateCompromisoWindow(today);
+  const windowInfo = calculateCompromisoWindow(today, isSuspended);
   const allowedForSuspended = isSuspended ? isSuspendedCompromisoAllowed(today) : true;
   
   const canRequest = isSuspended ? allowedForSuspended : windowInfo.isOpen;
@@ -106,6 +106,12 @@ export default function CompromisosScreen({ customer }) {
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-blue-100">
               <p className="text-xs sm:text-sm">
                 <strong>Información:</strong> Puedes solicitar fecha de pago hasta el {windowInfo.end.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit' })}.
+              </p>
+            </div>
+
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-yellow-200">
+              <p className="text-xs sm:text-sm leading-relaxed">
+                <strong>Importante:</strong> El compromiso tiene un costo de $2000 y en caso de que no se abone en la fecha indicada se abonará +$2000 de reconexión.
               </p>
             </div>
             

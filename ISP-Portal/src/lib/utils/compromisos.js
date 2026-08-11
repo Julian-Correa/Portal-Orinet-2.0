@@ -8,9 +8,10 @@
  * - NUNCA se pueden elegir fechas pasadas. La fecha mínima de selección siempre es max(hoy, inicio_ventana).
  * 
  * @param {Date} today Fecha base para el cálculo (generalmente hoy).
+ * @param {boolean} isSuspended Indica si el cliente está suspendido (por defecto falso).
  * @returns {Object} { start: Date, end: Date, minSelectable: Date, maxSelectable: Date, isOpen: boolean }
  */
-export function calculateCompromisoWindow(today = new Date()) {
+export function calculateCompromisoWindow(today = new Date(), isSuspended = false) {
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
   const currentDate = today.getDate();
@@ -37,9 +38,10 @@ export function calculateCompromisoWindow(today = new Date()) {
       startYear--;
     }
   } else {
-    // Del 11 al 25. La ventana comercialmente está "cerrada" o próxima.
-    // El sistema calculará la próxima ventana (26 de este mes al 10 del mes siguiente).
-    isOpen = false;
+    // Del 11 al 25.
+    // Si está habilitado (!isSuspended), la ventana está abierta para el próximo periodo.
+    // Si está suspendido, la ventana está cerrada.
+    isOpen = !isSuspended;
     endMonth = currentMonth + 1;
     if (endMonth > 11) {
       endMonth = 0;

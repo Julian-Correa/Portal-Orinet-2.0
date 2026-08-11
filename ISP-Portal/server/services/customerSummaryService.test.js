@@ -31,7 +31,7 @@ function createDependencies() {
       findPlanById: vi.fn().mockResolvedValue({ id: 99, name: "300 MB", price: 12345 }),
       getToken: vi.fn().mockResolvedValue("token-1"),
       updateCustomerEmail: vi.fn().mockResolvedValue(true),
-      findActiveExtras: vi.fn().mockResolvedValue([]),
+      findBillingExtras: vi.fn().mockResolvedValue({ extras: [], hasBilledSurcharge: false }),
     };
 
   const service = new CustomerSummaryService({

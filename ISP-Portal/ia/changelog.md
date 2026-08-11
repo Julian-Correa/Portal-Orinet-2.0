@@ -1,3 +1,17 @@
+## 2026-08-11
+
+### Ajustes en Reglas de Negocio de Compromisos y Recargos
+
+- **Compromisos de pago en "Días cerrados":**
+  - Los clientes *habilitados* (no suspendidos) ahora pueden solicitar un compromiso de pago incluso si se encuentran entre los días 11 y 25 del mes.
+  - El sistema detecta su estado y les abre la ventana automáticamente proyectándola al ciclo de facturación siguiente (del 26 del mes en curso al 10 del mes próximo).
+- **Avisos Informativos UX:**
+  - Se añadió una tarjeta amarilla obligatoria en la pantalla de Compromisos de Pago advirtiendo explícitamente: *"Importante: El compromiso tiene un costo de $2000 y en caso de que no se abone en la fecha indicada se abonará + de reconexión"*.
+- **Prevención de Doble Cobro en 2do Vencimiento:**
+  - Se modificó la arquitectura de extracción de facturas (IspRepository.findBillingExtras) para escanear de forma inteligente si ISPCube **ya emitió** un comprobante de "Recargo por Vencimiento".
+  - Si aún **no lo emitió** (y estamos entre el 11 y el 25), el portal suma matemáticamente el costo de 2do vencimiento a la deuda para que el cliente pague el total correcto.
+  - Si ISPCube **ya lo emitió** (por lo que el importe ya viene dentro de la deuda principal), el portal deja de sumarlo por su cuenta. En su lugar, muta la alerta amarilla en el estado de cuenta aclarando: *"Aviso: Su total ya incluye un recargo por 2do vencimiento de .000"*.
+
 ## 2026-08-10
 
 ### Funcionalidades PWA, UX Avanzada y Reglas de Negocio (Fases Finales)

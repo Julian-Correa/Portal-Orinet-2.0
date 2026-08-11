@@ -67,6 +67,7 @@ export default function App() {
                       cutDay={session.cutDay}
                       invoiceUrl={session.invoiceUrl}
                       planInfo={session.planInfo}
+                      hasBilledSurcharge={session.hasBilledSurcharge}
                       recargoReconexion={session.recargoReconexion}
                       recargoSegundoVencimiento={session.recargoSegundoVencimiento}
                       onUpdateCustomer={updateCustomer}

@@ -133,34 +133,44 @@ export class IspRepository {
     return null;
   }
 
-  async findActiveExtras(customerId, token) {
-    if (!customerId) return [];
+  async findBillingExtras(customerId, token) {
+    if (!customerId) return { extras: [], hasBilledSurcharge: false };
     
     try {
       const response = await this.request(`${this.isp.apiBase}/bills/bills_list?customer_id=${customerId}`, {
         headers: this.headers(token),
       });
 
-      if (!response.ok) return [];
+      if (!response.ok) return { extras: [], hasBilledSurcharge: false };
 
       const bills = await this.readJson(response, "bills/bills_list");
-      if (!Array.isArray(bills)) return [];
+      if (!Array.isArray(bills)) return { extras: [], hasBilledSurcharge: false };
 
-      // Facturas del cliente
       const customerBills = bills.filter(bill => {
         if (String(bill.customer_id) !== String(customerId)) return false;
         if (bill.canceled === 1) return false;
-        if (bill.internal_type === "surcharge") return false;
         return true;
       });
 
-      if (customerBills.length === 0) return [];
+      if (customerBills.length === 0) return { extras: [], hasBilledSurcharge: false };
 
-      // Encontrar la fecha de facturación más reciente para determinar el "mes actual"
-      const maxDateMs = Math.max(...customerBills.map(b => new Date(b.date).getTime()));
+      let hasBilledSurcharge = false;
+      for (const bill of customerBills) {
+        if (bill.status !== "paid" && Array.isArray(bill.items)) {
+          for (const item of bill.items) {
+            if (item.description && item.description.toLowerCase().includes("recargo por vencimiento")) {
+              hasBilledSurcharge = true;
+              break;
+            }
+          }
+        }
+        if (hasBilledSurcharge) break;
+      }
+
+      const activeBills = customerBills.filter(bill => bill.internal_type !== "surcharge");
+      const maxDateMs = Math.max(...activeBills.map(b => new Date(b.date).getTime()));
       
-      // Filtrar facturas que correspondan a este último ciclo (margen de 15 días por si se facturan extras en días separados)
-      const currentCycleBills = customerBills.filter(b => {
+      const currentCycleBills = activeBills.filter(b => {
         const diffDays = (maxDateMs - new Date(b.date).getTime()) / (1000 * 60 * 60 * 24);
         return diffDays <= 15;
       });
@@ -170,13 +180,10 @@ export class IspRepository {
 
       for (const bill of currentCycleBills) {
         if (!Array.isArray(bill.items)) continue;
-
         for (const item of bill.items) {
           if (!item.description) continue;
-
           const descLower = item.description.toLowerCase();
           const isAllowed = allowedExtras.some(allowed => descLower.includes(allowed));
-
           if (isAllowed && !item.plan_id && !item.surcharge_id) {
             const originalDesc = item.description.trim();
             if (!extrasMap.has(originalDesc)) {
@@ -189,10 +196,10 @@ export class IspRepository {
         }
       }
 
-      return Array.from(extrasMap.values());
+      return { extras: Array.from(extrasMap.values()), hasBilledSurcharge };
     } catch (error) {
       this.warn("isp_optional_extras_failed", { customerId, message: error.message });
-      return [];
+      return { extras: [], hasBilledSurcharge: false };
     }
   }
 

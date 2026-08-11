@@ -86,17 +86,18 @@ export class CustomerSummaryService {
       return { error: "cliente no encontrado", status: 404 };
     }
 
-    const [invoiceUrl, connection, costos, extrasList] = await Promise.all([
+    const [invoiceUrl, connection, costos, billingExtras] = await Promise.all([
       this.ispRepository.findLastInvoiceUrl(customer.id, token),
       this.ispRepository.findConnectionByCustomer(customer, token),
       this.configRepository ? this.configRepository.getCostos() : { recargoReconexion: 2000 },
-      this.ispRepository.findActiveExtras(customer.id, token)
+      this.ispRepository.findBillingExtras(customer.id, token)
     ]);
     const plan = await this.ispRepository.findPlanById(connection?.plan_id, token);
     const payload = {
       customer: this.sanitizeCustomer(customer),
       invoiceUrl,
-      extras: extrasList || [],
+      extras: billingExtras.extras || [],
+      hasBilledSurcharge: billingExtras.hasBilledSurcharge || false,
       planInfo: {
         plan: plan?.name || (connection?.plan_id ? `Plan ${connection.plan_id}` : "No informado"),
         price: plan?.price ? this.formatMoney(plan.price) : "No informado",

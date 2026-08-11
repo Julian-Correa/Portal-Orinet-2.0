@@ -70,6 +70,7 @@ export async function fetchCustomerSummaryByDNI(dni) {
     customer: data.customer,
     invoiceUrl: data.invoiceUrl || null,
     extras: data.extras || [],
+    hasBilledSurcharge: data.hasBilledSurcharge || false,
     planInfo: data.planInfo || getConnectionPlanInfo(null),
     recargoReconexion: Number(data?.recargoReconexion ?? DEFAULT_BILLING_RULES.recargoReconexion),
     recargoSegundoVencimiento: Number(

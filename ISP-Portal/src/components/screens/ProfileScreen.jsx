@@ -14,6 +14,7 @@ export default function ProfileScreen({
   recargoReconexion = 2000,
   recargoSegundoVencimiento = 2000,
   cutDay = 26,
+  hasBilledSurcharge = false,
   onUpdateCustomer,
 }) {
   const [copied, setCopied] = useState(null);
@@ -23,11 +24,12 @@ export default function ProfileScreen({
   const serviceStatus = getServiceStatus(customer.status);
   const currentDay = new Date().getDate();
   const recargo = serviceStatus.suspended ? recargoReconexion : 0;
-  const recargoSegundoVencimientoVisible = debt > 0 && currentDay >= 11 && currentDay <= 25;
-  const recargoSegundoVencimientoTotal = recargoSegundoVencimientoVisible ? recargoSegundoVencimiento : 0;
-  const totalDebt = debt + recargo + recargoSegundoVencimientoTotal;
-  const hasDebt = totalDebt > 0;
-  const hasSurchargeBreakdown = recargo > 0 || recargoSegundoVencimientoTotal > 0;
+  const isSecondDueDateWindow = debt > 0 && currentDay >= 11 && currentDay <= 25;
+  const shouldAddSurcharge = isSecondDueDateWindow && !hasBilledSurcharge;
+  
+  const totalDebt = debt + recargo + (shouldAddSurcharge ? recargoSegundoVencimiento : 0);
+
+  const hasSurchargeBreakdown = recargo > 0 || shouldAddSurcharge;
 
   const debtColor = !hasDebt ? "#10b981" : totalDebt > 5000 ? "#ef4444" : "#f59e0b";
   const debtBg = !hasDebt ? "rgba(16,185,129,0.12)" : totalDebt > 5000 ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)";
@@ -135,14 +137,23 @@ export default function ProfileScreen({
                     </div>
                   )}
 
-                  {recargoSegundoVencimientoTotal > 0 && (
+                  {shouldAddSurcharge && (
                     <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 280 }}>
                       <span style={{ color: "#f59e0b", fontSize: 13 }}>Recargo de 2do vencimiento</span>
                       <span style={{ color: "#f59e0b", fontSize: 13, fontWeight: 600 }}>
-                        + {formatMoney(recargoSegundoVencimientoTotal)}
+                        + {formatMoney(recargoSegundoVencimiento)}
                       </span>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Leyenda si el recargo de 2do vencimiento ya est facturado y estamos en fecha */}
+              {isSecondDueDateWindow && hasBilledSurcharge && (
+                <div style={{ display: "flex", justifyContent: "center", width: "100%", maxWidth: 280, marginTop: 12, padding: "8px", backgroundColor: "rgba(245, 158, 11, 0.1)", borderRadius: "6px", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
+                  <span style={{ color: "#fcd34d", fontSize: 12, textAlign: "center" }}>
+                    <strong>Aviso:</strong> Su total ya incluye un recargo por 2do vencimiento de <strong>{formatMoney(recargoSegundoVencimiento)}</strong>.
+                  </span>
                 </div>
               )}
 

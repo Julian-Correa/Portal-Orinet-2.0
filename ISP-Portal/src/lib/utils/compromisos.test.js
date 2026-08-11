@@ -46,18 +46,30 @@ describe("Compromisos de Pago - Lógica de Fechas", () => {
   });
 
   describe("Días fuera de ciclo (11 al 25)", () => {
-    it("Cierra la ventana y proyecta la próxima si hoy es 15 de Agosto", () => {
+    it("Permite a clientes habilitados seleccionar para la próxima ventana si hoy es 15 de Agosto", () => {
       // 15 de agosto 2026
       const today = new Date(2026, 7, 15);
-      const result = calculateCompromisoWindow(today);
+      const result = calculateCompromisoWindow(today, false); // isSuspended = false
       
-      expect(result.isOpen).toBe(false);
+      expect(result.isOpen).toBe(true);
       
       // Próxima ventana = 26 de agosto al 10 de septiembre
       expect(result.start.getMonth()).toBe(7);
       expect(result.start.getDate()).toBe(26);
       
       // Mínima seleccionable debe saltar al 26 de agosto (no puede elegir 15)
+      expect(result.minSelectable.getDate()).toBe(26);
+      expect(result.minSelectable.getMonth()).toBe(7);
+    });
+
+    it("Cierra la ventana para clientes suspendidos si hoy es 15 de Agosto", () => {
+      // 15 de agosto 2026
+      const today = new Date(2026, 7, 15);
+      const result = calculateCompromisoWindow(today, true); // isSuspended = true
+      
+      expect(result.isOpen).toBe(false);
+      
+      // Mínima seleccionable igual salta al 26
       expect(result.minSelectable.getDate()).toBe(26);
       expect(result.minSelectable.getMonth()).toBe(7);
     });
