@@ -68,8 +68,9 @@ describe("CustomerSummaryService", () => {
     const { customer, service } = createDependencies();
     const sanitized = service.sanitizeCustomer(customer);
 
-    expect(sanitized).toEqual({
+      expect(sanitized).toEqual({
       address: "Calle 123",
+      block_date: null,
       city: { name: "Cordoba", province: "Cordoba" },
       code: "CLI-7",
       contact_emails: [{ email: "ada@example.com", id: 12, principal: 1 }],

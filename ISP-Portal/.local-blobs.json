@@ -1,6 +1,6 @@
 {
   "orinet-config": {
-    "metrics:visits": 16,
+    "metrics:visits": 20,
     "config:popup": {
       "enabled": false,
       "imageUrl": "",

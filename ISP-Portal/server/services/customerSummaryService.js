@@ -49,6 +49,7 @@ export class CustomerSummaryService {
       debt: customer?.debt || "0",
       duedebt: customer?.duedebt || "0",
       status: customer?.status || "",
+      block_date: customer?.block_date || null,
       city: {
         name: city.name || "",
         province: city.province || "",
