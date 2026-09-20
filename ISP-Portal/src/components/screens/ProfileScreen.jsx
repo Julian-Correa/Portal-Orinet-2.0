@@ -151,7 +151,7 @@ export default function ProfileScreen({
 
               {/* Leyenda si el recargo de 2do vencimiento ya est facturado y estamos en fecha */}
               {isSecondDueDateWindow && hasBilledSurcharge && (
-                <div style={{ display: "flex", justifyContent: "center", width: "100%", maxWidth: 280, marginTop: 12, padding: "8px", backgroundColor: "rgba(245, 158, 11, 0.1)", borderRadius: "6px", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
+                <div style={{ display: "flex", justifyContent: "center", margin: "12px auto 0", width: "100%", maxWidth: 280, padding: "8px", backgroundColor: "rgba(245, 158, 11, 0.1)", borderRadius: "6px", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
                   <span style={{ color: "#fcd34d", fontSize: 12, textAlign: "center" }}>
                     <strong>Aviso:</strong> Su total ya incluye un recargo por 2do vencimiento de <strong>{formatMoney(recargoSegundoVencimiento)}</strong>.
                   </span>
