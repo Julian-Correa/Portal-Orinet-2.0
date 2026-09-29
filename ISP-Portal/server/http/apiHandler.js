@@ -307,6 +307,7 @@ export function createApiHandler({
         const subscriptions = await cache.getAllSubscriptions();
         
         let sentCount = 0;
+        let failedCount = 0;
         const payload = JSON.stringify({
           title: title || "OriNet",
           body: message,
@@ -318,11 +319,17 @@ export function createApiHandler({
             await webpush.sendNotification(sub.subscription, payload);
             sentCount++;
           } catch (err) {
-            console.error(`Error enviando broadcast push a dni ${sub.dni}:`, err);
+            failedCount++;
+            console.error(`Error enviando broadcast push a dni ${sub.dni}:`, err.message);
           }
         }
 
-        return json(200, { ok: true, sent: sentCount }, headers);
+        return json(200, {
+          ok: true,
+          subscribers: subscriptions.length,
+          sent: sentCount,
+          failed: failedCount,
+        }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {

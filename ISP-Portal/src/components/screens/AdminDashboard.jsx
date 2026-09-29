@@ -469,9 +469,16 @@ export default function AdminDashboard({ session }) {
         </div>
 
         {broadcastResult && (
-          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
-            Aviso enviado correctamente a {broadcastResult.sent} cliente{broadcastResult.sent === 1 ? "" : "s"}.
-          </div>
+          broadcastResult.subscribers === 0 ? (
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
+              No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular.
+            </div>
+          ) : (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
+              Aviso enviado a {broadcastResult.sent} de {broadcastResult.subscribers} cliente{broadcastResult.subscribers === 1 ? "" : "s"} suscripto{broadcastResult.subscribers === 1 ? "" : "s"}.
+              {broadcastResult.failed > 0 && ` (${broadcastResult.failed} fallaron)`}
+            </div>
+          )
         )}
 
         {showBroadcast && (
