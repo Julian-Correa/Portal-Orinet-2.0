@@ -1,4 +1,4 @@
-import { getCustomerSummaryService, getHealthStatus } from "../app/runtime.js";
+import { getCustomerSummaryService, getHealthStatus, getCache } from "../app/runtime.js";
 import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
 import { configRepository } from "../repositories/configRepository.js";
@@ -279,6 +279,32 @@ export function createApiHandler({
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {
         await metricsRepository.incrementComprobanteClicks();
+        return json(200, { ok: true }, headers);
+      }
+
+      if (routePath === "/push/subscribe" && method === "POST") {
+        const originError = validateOrigin(event, headers);
+        if (originError) return originError;
+
+        let body;
+        try {
+          body = parseBody(event);
+        } catch (error) {
+          if (error instanceof PayloadTooLargeError) {
+            return json(413, { error: error.message }, headers);
+          }
+          log("warn", "api_invalid_json_body", { routePath, message: error.message });
+          return json(400, { error: "json invalido" }, headers);
+        }
+
+        const { dni, subscription } = body;
+        if (!dni || !subscription) {
+          return json(400, { error: "dni y subscription requeridos" }, headers);
+        }
+
+        const cache = await getCache();
+        await cache.saveSubscription(dni, subscription);
+        
         return json(200, { ok: true }, headers);
       }
 

@@ -7,12 +7,15 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       registerType: 'autoUpdate',
       includeAssets: ['orinet2.svg', 'Orinet.svg'],
       manifest: {
         name: 'Portal OriNet',
         short_name: 'OriNet',
-        description: 'Portal de autogestión de servicios OriNet',
+        description: 'Portal de autogestin de servicios OriNet',
         theme_color: '#0d2240',
         background_color: '#0a0f1e',
         display: 'standalone',
@@ -26,9 +29,8 @@ export default defineConfig({
           }
         ]
       },
-      workbox: {
+      injectManifest: {
         // Excluir la carpeta api/ ya que es de netlify functions
-        navigateFallbackDenylist: [/^\/api/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
       }
     })

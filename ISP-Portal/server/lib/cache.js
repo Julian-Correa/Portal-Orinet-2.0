@@ -88,4 +88,59 @@ export class CacheClient {
   isRedisEnabled() {
     return Boolean(this.redis);
   }
+
+  // --- Push Subscriptions Management ---
+  async saveSubscription(dni, subscription) {
+    if (this.redis) {
+      try {
+        await this.redis.hSet("push:subscriptions", dni, JSON.stringify(subscription));
+        return;
+      } catch (error) {
+        console.warn("Redis hSet fallback:", error.message);
+      }
+    }
+    // Memory fallback
+    let subs = this.memory.get("push:subscriptions");
+    if (!subs) {
+      subs = new Map();
+      this.memory.set("push:subscriptions", subs);
+    }
+    subs.set(dni, subscription);
+  }
+
+  async getSubscription(dni) {
+    if (this.redis) {
+      try {
+        const val = await this.redis.hGet("push:subscriptions", dni);
+        return val ? JSON.parse(val) : null;
+      } catch (error) {
+        console.warn("Redis hGet fallback:", error.message);
+      }
+    }
+    // Memory fallback
+    const subs = this.memory.get("push:subscriptions");
+    return subs ? (subs.get(dni) || null) : null;
+  }
+
+  async getAllSubscriptions() {
+    if (this.redis) {
+      try {
+        const all = await this.redis.hGetAll("push:subscriptions");
+        return Object.entries(all).map(([dni, sub]) => ({
+          dni,
+          subscription: JSON.parse(sub)
+        }));
+      } catch (error) {
+        console.warn("Redis hGetAll fallback:", error.message);
+      }
+    }
+    // Memory fallback
+    const subs = this.memory.get("push:subscriptions");
+    if (!subs) return [];
+    
+    return Array.from(subs.entries()).map(([dni, sub]) => ({
+      dni,
+      subscription: sub
+    }));
+  }
 }

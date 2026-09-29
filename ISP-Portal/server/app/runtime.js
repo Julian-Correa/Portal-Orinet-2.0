@@ -44,6 +44,10 @@ export async function getCustomerSummaryService() {
   return (await getRuntime()).customerSummaryService;
 }
 
+export async function getCache() {
+  return (await getRuntime()).cache;
+}
+
 export async function getHealthStatus() {
   const { cache } = await getRuntime();
   return {

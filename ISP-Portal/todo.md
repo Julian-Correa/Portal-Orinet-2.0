@@ -70,3 +70,11 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
   - Se actualizó el backend, la caché de sesión y la vista `/servicios` para mostrar dinámicamente estos extras facturados junto a su precio correspondiente.
 
 (Fin del scope actual. Portal versión estable con Compromisos de Pago y Extras integrados.)
+## 9. Notificaciones Push (Web Push) & Automatizacion
+- [x] 9.1 **Backend - Setup:** Instalar web-push, generar claves VAPID y configurar variables de entorno (.env).
+- [x] 9.2 **Backend - Storage:** Modificar CacheClient para gestionar las suscripciones Push en Redis (Guardar, Buscar por DNI, Obtener todas).
+- [x] 9.3 **Backend - Endpoint:** Crear POST /api/push/subscribe en apiHandler.js para recibir y guardar la suscripcion.
+- [x] 9.4 **Frontend - Service Worker:** Cambiar vite.config.js a injectManifest y crear src/sw.js para interceptar eventos push y notificationclick.
+- [x] 9.5 **Frontend - UI:** Crear un componente (boton/banner) en el portal para solicitar permisos Notification.requestPermission() y enviar la suscripcion a la API.
+- [x] 9.6 **Automatizacion (Netlify Cron):** Crear netlify/functions/cron-notificaciones.js para que corra los dias 9 y 24 del mes.
+- [x] 9.7 **Logica del Cron:** Leer todas las suscripciones, chequear la deuda en la API de ISPCube de cada DNI y enviar el Push a los morosos.

@@ -2,6 +2,7 @@ import { Outlet, Navigate } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import ErrorBoundary from "../ErrorBoundary.jsx";
+import { PushNotificationBanner } from "../PushNotificationBanner.jsx";
 
 export default function MainLayout({ session, onLogout }) {
   // Protect routes - if no session, redirect to login
@@ -21,6 +22,8 @@ export default function MainLayout({ session, onLogout }) {
     >
       <Navbar onLogout={onLogout} isAdmin={isAdmin} />
       
+      {!isAdmin && <PushNotificationBanner />}
+
       <main className="flex-grow w-full">
         <ErrorBoundary>
           <Outlet />

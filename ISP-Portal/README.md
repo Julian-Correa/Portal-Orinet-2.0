@@ -150,3 +150,19 @@ La carpeta `ia/` contiene documentacion detallada del proyecto para continuidad:
 - El CBU se toma de `customer_cbu[0]`; si no existe, se muestra solo el alias fijo.
 - El acceso por DNI sin OTP es una decision de negocio vigente para este proyecto.
 - Configuración y Métricas: A partir de la versión 2.0 se utiliza Netlify Blobs como fuente de verdad para parámetros configurables y métricas (con adaptador JSON para desarrollo local).
+
+## Notificaciones Push (Web Push)
+El portal soporta envio automatizado de Notificaciones Push a los clientes mediante un Cron Job en Netlify.
+
+### Requisitos
+Se requieren las siguientes variables en .env (y en Netlify):
+    VITE_VAPID_PUBLIC_KEY=clave_publica
+    VAPID_PRIVATE_KEY=clave_privada
+    
+(Opcional) Las suscripciones se almacenan en el Redis configurado (push:subscriptions). Si no hay Redis, solo duran en memoria.
+
+### Automatizacion
+- **Cron (Netlify Function):** 
+etlify/functions/cron-notificaciones.js
+- **Schedule:** Dias 9 y 24 del mes a las 10:00 AM.
+- **Logica:** Recorre todas las suscripciones, consulta la deuda a la API del ISP y envia un recordatorio de 1er o 2do vencimiento solo a aquellos con deuda activa.
