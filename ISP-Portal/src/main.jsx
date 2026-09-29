@@ -6,11 +6,10 @@ import './index.css'
 import App from './App.jsx'
 
 // Registrar Service Worker para PWA
-const updateSW = registerSW({
-  onNeedRefresh() {
-    // Podrías mostrar un toast avisando que hay una nueva versión
-    // Por ahora, recargamos directamente para obtener la nueva versión
-    updateSW(true);
+registerSW({
+  onNeedReload() {
+    // Sin recarga automatica: el SW se actualiza en silencio y la version
+    // nueva se aplica en la proxima visita del usuario.
   },
   onOfflineReady() {
     console.log('App lista para trabajar offline');
