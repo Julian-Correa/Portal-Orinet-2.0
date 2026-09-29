@@ -12,7 +12,7 @@ async function handleResponse(response) {
   let data = null;
   try {
     data = await response.json();
-  } catch (e) {
+  } catch {
     // ignore
   }
 
@@ -74,6 +74,15 @@ export const adminApi = {
       method: "PUT",
       headers: getHeaders(adminCode),
       body: JSON.stringify(planes),
+    });
+    return handleResponse(res);
+  },
+
+  async sendBroadcastPush(adminCode, { title, message }) {
+    const res = await fetch(`${PORTAL_API_BASE}/admin/push/broadcast`, {
+      method: "POST",
+      headers: getHeaders(adminCode),
+      body: JSON.stringify({ title, message }),
     });
     return handleResponse(res);
   }

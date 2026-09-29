@@ -50,6 +50,13 @@ export default function AdminDashboard({ session }) {
   const [savingPlanes, setSavingPlanes] = useState(false);
   const [lastSavedPlanId, setLastSavedPlanId] = useState(null);
 
+  // Aviso General (Broadcast Push) State
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState("");
+  const [broadcastMessage, setBroadcastMessage] = useState("");
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState(null);
+
   const [error, setError] = useState("");
 
 
@@ -155,6 +162,31 @@ export default function AdminDashboard({ session }) {
       console.error(err);
     } finally {
       setSavingPlanes(false);
+    }
+  };
+
+  const handleSendBroadcast = async () => {
+    if (!broadcastMessage.trim()) {
+      setError("El mensaje del aviso no puede estar vacio.");
+      return;
+    }
+    setSendingBroadcast(true);
+    setBroadcastResult(null);
+    setError("");
+    try {
+      const result = await adminApi.sendBroadcastPush(adminCode, {
+        title: broadcastTitle.trim() || "OriNet",
+        message: broadcastMessage.trim(),
+      });
+      setBroadcastResult(result);
+      setBroadcastTitle("");
+      setBroadcastMessage("");
+      setTimeout(() => setBroadcastResult(null), 6000);
+    } catch (err) {
+      setError("Error al enviar el aviso general.");
+      console.error(err);
+    } finally {
+      setSendingBroadcast(false);
     }
   };
 
@@ -421,7 +453,71 @@ export default function AdminDashboard({ session }) {
         </div>
       </div>
 
-      {/* 4. CARD PLANES DISPONIBLES */}
+      {/* 4. CARD AVISO GENERAL */}
+      <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 sm:p-6 shadow-xl mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+          <div>
+            <h2 className="text-lg font-bold text-white tracking-wide mb-1">AVISO GENERAL</h2>
+            <p className="text-sm text-slate-400">Envia una notificacion push a todos los clientes con notificaciones activadas.</p>
+          </div>
+          <button
+            onClick={() => setShowBroadcast(!showBroadcast)}
+            className="w-full sm:w-auto shrink-0 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors active:scale-95 min-h-[44px]"
+          >
+            {showBroadcast ? "Cerrar" : "Aviso General"}
+          </button>
+        </div>
+
+        {broadcastResult && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
+            Aviso enviado correctamente a {broadcastResult.sent} cliente{broadcastResult.sent === 1 ? "" : "s"}.
+          </div>
+        )}
+
+        {showBroadcast && (
+          <div className="bg-[#151D2D] border border-white/5 rounded-xl p-4 sm:p-5 mt-4 space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">Titulo (opcional)</label>
+              <input
+                type="text"
+                className="w-full bg-[#080D1C] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-red-500 min-h-[44px]"
+                value={broadcastTitle}
+                onChange={(e) => setBroadcastTitle(e.target.value)}
+                placeholder="OriNet"
+                maxLength={60}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1">Mensaje del aviso</label>
+              <textarea
+                className="w-full bg-[#080D1C] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-red-500 min-h-[110px] resize-y"
+                value={broadcastMessage}
+                onChange={(e) => setBroadcastMessage(e.target.value)}
+                placeholder="Escribe aqui el aviso que recibiran tus clientes..."
+                maxLength={300}
+              />
+              <p className="text-xs text-slate-500 mt-1">{broadcastMessage.length}/300 caracteres</p>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-2 pt-1">
+              <button
+                onClick={() => setShowBroadcast(false)}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-300 bg-white/5 hover:bg-white/10 rounded-lg transition-colors min-h-[44px]"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSendBroadcast}
+                disabled={sendingBroadcast || !broadcastMessage.trim()}
+                className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 min-h-[44px]"
+              >
+                {sendingBroadcast ? "Enviando..." : "Enviar aviso"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 5. CARD PLANES DISPONIBLES */}
       <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 sm:p-6 shadow-xl mb-8">
         <div className="mb-6">
           <h2 className="text-lg font-bold text-white tracking-wide mb-1">PLANES DISPONIBLES</h2>

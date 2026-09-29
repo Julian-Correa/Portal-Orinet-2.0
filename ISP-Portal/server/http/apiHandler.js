@@ -3,6 +3,16 @@ import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
 import { configRepository } from "../repositories/configRepository.js";
 import { metricsRepository } from "../repositories/metricsRepository.js";
+import webpush from "web-push";
+
+// Configurar Web Push para broadcasts
+if (process.env.VAPID_PRIVATE_KEY && (process.env.VITE_VAPID_PUBLIC_KEY || process.env.VAPID_PUBLIC_KEY)) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || "mailto:contacto@orinet.com.ar",
+    process.env.VITE_VAPID_PUBLIC_KEY || process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 const rateLimitBuckets = new Map();
 
@@ -275,6 +285,44 @@ export function createApiHandler({
         const adminError = validateAdmin(event, headers);
         if (adminError) return adminError;
         return json(200, await metricsRepository.getMetrics(), headers);
+      }
+
+      if (routePath === "/admin/push/broadcast" && method === "POST") {
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+
+        let body;
+        try {
+          body = parseBody(event);
+        } catch {
+          return json(400, { error: "json invalido" }, headers);
+        }
+
+        const { title, message } = body;
+        if (!message) {
+          return json(400, { error: "el mensaje es requerido" }, headers);
+        }
+
+        const cache = await getCache();
+        const subscriptions = await cache.getAllSubscriptions();
+        
+        let sentCount = 0;
+        const payload = JSON.stringify({
+          title: title || "OriNet",
+          body: message,
+          url: "/"
+        });
+
+        for (const sub of subscriptions) {
+          try {
+            await webpush.sendNotification(sub.subscription, payload);
+            sentCount++;
+          } catch (err) {
+            console.error(`Error enviando broadcast push a dni ${sub.dni}:`, err);
+          }
+        }
+
+        return json(200, { ok: true, sent: sentCount }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {
