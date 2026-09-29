@@ -146,8 +146,26 @@ function validateServerConfig(headers) {
 
 function validateOrigin(event, headers) {
   const origin = getHeader(event.headers, "origin");
-
   if (origin === env.corsOrigin) return null;
+
+  // Permitir requests same-origin: el sitio llamando a su propia API (/api/*).
+  // En Netlify el frontend y la function comparten dominio, por lo que el
+  // host del request coincide con el host del origin aunque CORS_ORIGIN
+  // este desactualizado.
+  const host = getHeader(event.headers, "host");
+  if (origin && host) {
+    try {
+      if (new URL(origin).host === host) return null;
+    } catch {
+      // origin invalido: seguir con el resto de validaciones
+    }
+  }
+
+  // Permitir los URLs del sitio en Netlify (produccion y deploy previews)
+  const siteUrls = [process.env.URL, process.env.DEPLOY_PRIME_URL]
+    .filter(Boolean)
+    .map((u) => u.replace(/\/$/, ""));
+  if (origin && siteUrls.includes(origin.replace(/\/$/, ""))) return null;
 
   log("warn", "api_origin_blocked", {
     routePath: getRoutePath(event),

@@ -3,6 +3,14 @@ import { useCustomerSession } from '../hooks/useCustomerSession';
 
 const PORTAL_API_BASE = import.meta.env.VITE_PORTAL_API_BASE || "";
 
+// En iOS/Safari en pestana normal no existe window.Notification
+// (solo esta disponible dentro de la PWA instalada). Si tocamos
+// Notification.permission ahi, la app completa crashea.
+const hasPushSupport =
+  typeof window !== "undefined" &&
+  "Notification" in window &&
+  "serviceWorker" in navigator;
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
@@ -53,10 +61,13 @@ async function ensureSubscription() {
 export function PushNotificationBanner() {
   const { session } = useCustomerSession();
   const [showBanner, setShowBanner] = useState(false);
-  const [permission, setPermission] = useState(Notification.permission);
+  const [permission, setPermission] = useState(() =>
+    hasPushSupport ? Notification.permission : "denied"
+  );
   const [subError, setSubError] = useState("");
 
   useEffect(() => {
+    if (!hasPushSupport) return;
     if (!session || !session.customer || !session.customer.doc_number) {
       setShowBanner(false);
       return;
@@ -72,6 +83,7 @@ export function PushNotificationBanner() {
   // Asi nos recuperamos si el servidor perdio las suscripciones (RAM efimera)
   // o si se rotaron las claves VAPID.
   useEffect(() => {
+    if (!hasPushSupport) return;
     if (!session || !session.customer || !session.customer.doc_number) return;
     if (Notification.permission !== 'granted') return;
 
@@ -102,6 +114,7 @@ export function PushNotificationBanner() {
   }, [session]);
 
   const handleSubscribe = async () => {
+    if (!hasPushSupport) return;
     setSubError("");
     try {
       const perm = await Notification.requestPermission();
@@ -138,7 +151,7 @@ export function PushNotificationBanner() {
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
+  if (!hasPushSupport || !showBanner) return null;
 
   return (
     <div className="bg-sky-500/10 border border-sky-500/30 text-sky-200 px-4 py-3 rounded-xl flex items-center justify-between shadow-lg mx-4 mt-4 mb-2 animate-fade-in z-50">
