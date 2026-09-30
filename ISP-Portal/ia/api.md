@@ -85,6 +85,105 @@
   "redis": false
 }
 
+## Notificaciones push
+
+Todas las rutas `admin/*` requieren el header `X-Admin-Code` (si no coincide se responde `401`).
+
+### `POST /push/subscribe`
+
+#### Body
+
+{
+  "dni": "20123456",
+  "subscription": { "endpoint": "https://...", "keys": { "p256dh": "...", "auth": "..." } }
+}
+
+#### Reglas
+
+- Requiere `Origin` valido contra `CORS_ORIGIN`.
+- Se guarda en `push:subscriptions` (Redis, o Netlify Blobs / memoria como fallback).
+
+#### Respuesta exitosa `200`
+
+{ "ok": true }
+
+### `GET /admin/push/avisos`
+
+Devuelve los textos por defecto de cada aviso (para usarlos como placeholder) y los textos guardados desde el panel. Un campo vacio significa "usar el texto por defecto".
+
+#### Respuesta exitosa `200`
+
+{
+  "defaults": {
+    "1": { "title": "...", "body": "..." },
+    "9": { "title": "...", "body": "..." },
+    "24": { "title": "...", "body": "..." }
+  },
+  "avisos": {
+    "1": { "title": "", "body": "" },
+    "9": { "title": "Titulo editado", "body": "" },
+    "24": { "title": "", "body": "" }
+  }
+}
+
+### `PUT /admin/push/avisos`
+
+#### Body
+
+Parcial: solo los dias que se quieran actualizar. Titulo max 60 caracteres, mensaje max 300.
+
+{
+  "9": { "title": "Titulo editado", "body": "Mensaje editado" }
+}
+
+#### Respuesta exitosa `200`
+
+{ "avisos": { "1": {...}, "9": {...}, "24": {...} } }
+
+Los textos guardados se usan en los crons automaticos de los dias 1, 9 y 24.
+
+### `POST /admin/push/trigger`
+
+Ejecucion manual de un aviso (simula el cron del dia pedido, con el mismo filtro de envio).
+
+#### Body
+
+{
+  "dia": 9,
+  "title": "Titulo opcional",
+  "body": "Mensaje opcional"
+}
+
+#### Reglas
+
+- `dia` obligatorio y valido: `1`, `9` o `24` (sino `400`).
+- Si `title` / `body` no vienen, se usan los textos guardados. Si vienen vacios, el texto por defecto.
+- Filtro: solo clientes habilitados (`active` / `activo` / `enabled`). En los dias 9 y 24 solo clientes con deuda (`debt > 0` o `duedebt > 0`).
+
+#### Respuesta exitosa `200`
+
+{ "ok": true, "dia": 9, "enviados": 12, "encontrados": 40 }
+
+- `enviados`: push efectivamente enviados
+- `encontrados`: suscripciones totales recorridas
+
+#### Errores esperados
+
+- `400`: `dia invalido` o `json invalido`
+- `401`: `no autorizado`
+
+### `POST /admin/push/broadcast`
+
+Aviso general a todas las suscripciones, sin filtro de cliente.
+
+#### Body
+
+{ "title": "OriNet", "message": "Mensaje del aviso" }
+
+#### Respuesta exitosa `200`
+
+{ "ok": true, "subscribers": 40, "sent": 38, "failed": 2 }
+
 ## Endpoints externos usados (ISPCube)
 
 - `POST /sanctum/token`

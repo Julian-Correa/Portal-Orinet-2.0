@@ -1,4 +1,5 @@
 import { BlobAdapter } from "./blobAdapter.js";
+import { DIAS_AVISO } from "../lib/notificaciones.js";
 
 const configStore = new BlobAdapter("orinet-config");
 
@@ -58,5 +59,42 @@ export const configRepository = {
     if (!Array.isArray(planesArray)) throw new Error("Los planes deben ser un array");
     await configStore.setJSON("config:planes", planesArray);
     return planesArray;
+  },
+
+  // --- Avisos push (textos de los avisos programados) ---
+  // Texto vacio = se usa el texto por defecto del aviso.
+  async getAvisosPush() {
+    const guardado = (await configStore.get("config:avisosPush")) || {};
+
+    return Object.fromEntries(
+      DIAS_AVISO.map((dia) => {
+        const entry = guardado[dia] || {};
+        return [
+          dia,
+          {
+            title: String(entry.title ?? "").trim(),
+            body: String(entry.body ?? "").trim(),
+          },
+        ];
+      })
+    );
+  },
+
+  async updateAvisosPush(avisosData) {
+    const actuales = await this.getAvisosPush();
+    const actualizado = { ...actuales };
+
+    for (const dia of DIAS_AVISO) {
+      const entry = avisosData?.[dia];
+      if (!entry || typeof entry !== "object") continue;
+
+      actualizado[dia] = {
+        title: String(entry.title ?? "").trim().slice(0, 60),
+        body: String(entry.body ?? "").trim().slice(0, 300),
+      };
+    }
+
+    await configStore.setJSON("config:avisosPush", actualizado);
+    return actualizado;
   }
 };

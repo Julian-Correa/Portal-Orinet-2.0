@@ -78,3 +78,7 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
 - [x] 9.5 **Frontend - UI:** Crear un componente (boton/banner) en el portal para solicitar permisos Notification.requestPermission() y enviar la suscripcion a la API.
 - [x] 9.6 **Automatizacion (Netlify Cron):** Crear netlify/functions/cron-notificaciones.js para que corra los dias 9 y 24 del mes.
 - [x] 9.7 **Logica del Cron:** Leer todas las suscripciones, chequear la deuda en la API de ISPCube de cada DNI y enviar el Push a los morosos.
+- [x] 9.8 **Filtro de status:** Enviar solo a clientes habilitados (`active`/`activo`/`enabled`) en los 3 avisos; bloqueados y suspendidos no reciben push.
+- [x] 9.9 **Cron dia 1:** Crear `cron-facturacion.js` (`0 10 1 * *`) con el aviso "Facturacion disponible", sin filtro de deuda.
+- [x] 9.10 **Textos editables:** Extraer avisos a `server/lib/notificaciones.js`, persistirlos en `config:avisosPush` y exponer `GET`/`PUT /admin/push/avisos`.
+- [x] 9.11 **Ejecucion manual:** `POST /admin/push/trigger` + card "Avisos push programados" en `AdminDashboard` con botones 1/x, 9/x y 24/x.

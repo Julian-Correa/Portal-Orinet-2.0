@@ -85,5 +85,30 @@ export const adminApi = {
       body: JSON.stringify({ title, message }),
     });
     return handleResponse(res);
+  },
+
+  async getAvisosPush(adminCode) {
+    const res = await fetch(`${PORTAL_API_BASE}/admin/push/avisos`, {
+      headers: getHeaders(adminCode),
+    });
+    return handleResponse(res);
+  },
+
+  async updateAvisosPush(adminCode, aviso) {
+    const res = await fetch(`${PORTAL_API_BASE}/admin/push/avisos`, {
+      method: "PUT",
+      headers: getHeaders(adminCode),
+      body: JSON.stringify(aviso),
+    });
+    return handleResponse(res);
+  },
+
+  async triggerPush(adminCode, { dia, title, body }) {
+    const res = await fetch(`${PORTAL_API_BASE}/admin/push/trigger`, {
+      method: "POST",
+      headers: getHeaders(adminCode),
+      body: JSON.stringify({ dia, title, body }),
+    });
+    return handleResponse(res);
   }
 };

@@ -152,17 +152,58 @@ La carpeta `ia/` contiene documentacion detallada del proyecto para continuidad:
 - Configuración y Métricas: A partir de la versión 2.0 se utiliza Netlify Blobs como fuente de verdad para parámetros configurables y métricas (con adaptador JSON para desarrollo local).
 
 ## Notificaciones Push (Web Push)
-El portal soporta envio automatizado de Notificaciones Push a los clientes mediante un Cron Job en Netlify.
+
+El portal envia notificaciones push automaticas (3 avisos por mes) y permite editar sus textos y dispararlos manualmente desde el panel de administracion.
 
 ### Requisitos
-Se requieren las siguientes variables en .env (y en Netlify):
+
+Variables en `.env` local y en la configuracion del sitio de Netlify:
+
     VITE_VAPID_PUBLIC_KEY=clave_publica
     VAPID_PRIVATE_KEY=clave_privada
-    
-(Opcional) Las suscripciones se almacenan en el Redis configurado (push:subscriptions). Si no hay Redis, solo duran en memoria.
+    VAPID_SUBJECT=mailto:contacto@orinet.com.ar
 
-### Automatizacion
-- **Cron (Netlify Function):** 
-etlify/functions/cron-notificaciones.js
-- **Schedule:** Dias 9 y 24 del mes a las 10:00 AM.
-- **Logica:** Recorre todas las suscripciones, consulta la deuda a la API del ISP y envia un recordatorio de 1er o 2do vencimiento solo a aquellos con deuda activa.
+(Opcional) Las suscripciones se almacenan en el Redis configurado (`push:subscriptions`). Sin Redis se persisten en Netlify Blobs y, en ultima instancia, solo duran en memoria.
+
+### Automatizacion (Crons Netlify)
+
+| Dia | Function | Schedule | Contenido | Filtro de envio |
+| --- | --- | --- | --- | --- |
+| 1 | `cron-facturacion.js` | `0 10 1 * *` | Facturacion disponible | Solo clientes habilitados |
+| 9 | `cron-notificaciones.js` | `0 10 9,24 * *` | 1er vencimiento | Habilitados y con deuda |
+| 24 | `cron-notificaciones.js` | `0 10 9,24 * *` | 2do vencimiento y fecha de corte | Habilitados y con deuda |
+
+Logica comun (ambos crons):
+
+1. Recorren todas las suscripciones push.
+2. Consultan el resumen del cliente por DNI contra ISPCube.
+3. Descartan los clientes sin `status` habilitado: `active`, `activo` o `enabled` (`isServiceEnabled` en `src/lib/utils/customer.js`). Bloqueados, suspendidos, `no_service`, vacios o desconocidos no reciben push.
+4. Construyen el payload con `armarPayloadAviso` (`server/lib/notificaciones.js`). En los dias 9 y 24 exige `debt > 0` o `duedebt > 0`; el dia 1 no exige deuda.
+5. Si el titulo o el mensaje configurados estan vacios, se usa el texto preestablecido del aviso.
+6. Envia via `web-push` (`server/lib/pushNotifications.js`), aislando errores por suscripcion.
+
+### Textos configurables y ejecucion manual
+
+Card **"AVISOS PUSH PROGRAMADOS"** del `AdminDashboard`, con un bloque por aviso (`1/x`, `9/x`, `24/x`):
+
+- **Editar titulo y mensaje:** el texto por defecto se muestra como placeholder. Campo vacio = texto preestablecido.
+- **Guardar textos:** persiste en Netlify Blobs (`config:avisosPush`) y a partir de ahi se usa tambien en los crons automaticos.
+- **Ejecutar X/x:** dispara ese aviso en el momento, con el mismo filtro que el cron (solo habilitados; en 9 y 24 solo con deuda).
+
+### Endpoints admin (header `X-Admin-Code`)
+
+- `GET /api/admin/push/avisos` -> `{ defaults, avisos }`
+- `PUT /api/admin/push/avisos` -> guarda los textos editados (vacio = default)
+- `POST /api/admin/push/trigger` con `{ "dia": 1|9|24, "title": "...", "body": "..." }` -> ejecucion manual
+- `POST /api/admin/push/broadcast` con `{ "title": "...", "message": "..." }` -> aviso general a todos los suscriptos
+
+### Archivos
+
+    server/lib/notificaciones.js               # avisos, textos por defecto y regla de deuda
+    server/lib/pushNotifications.js            # envio comun a suscriptos habilitados
+    server/repositories/configRepository.js    # persistencia de config:avisosPush
+    netlify/functions/cron-facturacion.js      # aviso del dia 1
+    netlify/functions/cron-notificaciones.js   # avisos de los dias 9 y 24
+    netlify/functions/api.js                   # entrypoint de los endpoints admin
+    src/lib/utils/customer.js                  # isServiceEnabled (status habilitado)
+    src/components/screens/AdminDashboard.jsx  # edicion de textos y ejecucion manual

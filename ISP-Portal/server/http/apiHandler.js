@@ -3,6 +3,8 @@ import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
 import { configRepository } from "../repositories/configRepository.js";
 import { metricsRepository } from "../repositories/metricsRepository.js";
+import { enviarPushAClientes } from "../lib/pushNotifications.js";
+import { DIAS_AVISO, armarPayloadAviso, textosPorDefecto } from "../lib/notificaciones.js";
 import webpush from "web-push";
 
 // Configurar Web Push para broadcasts
@@ -190,6 +192,8 @@ function isTimeoutError(error) {
 export function createApiHandler({
   getCustomerSummaryService: getService = getCustomerSummaryService,
   getHealthStatus: getHealth = getHealthStatus,
+  configRepo = configRepository,
+  enviarPush = enviarPushAClientes,
 } = {}) {
   return async function handleRequest(event = {}) {
     const startedAt = Date.now();
@@ -260,7 +264,7 @@ export function createApiHandler({
       }
 
       if (routePath === "/planes" && method === "GET") {
-        return json(200, await configRepository.getPlanes(), headers);
+        return json(200, await configRepo.getPlanes(), headers);
       }
 
       // --- ENDPOINTS ADMINISTRATIVOS (Config) ---
@@ -271,28 +275,28 @@ export function createApiHandler({
         const subRoute = routePath.replace("/admin/config/", "");
 
         if (subRoute === "costos") {
-          if (method === "GET") return json(200, await configRepository.getCostos(), headers);
+          if (method === "GET") return json(200, await configRepo.getCostos(), headers);
           if (method === "PUT") {
             const body = parseBody(event);
-            const result = await configRepository.updateCostos(body);
+            const result = await configRepo.updateCostos(body);
             return json(200, result, headers);
           }
         }
         
         if (subRoute === "popup") {
-          if (method === "GET") return json(200, await configRepository.getPopupConfig(), headers);
+          if (method === "GET") return json(200, await configRepo.getPopupConfig(), headers);
           if (method === "PUT") {
             const body = parseBody(event);
-            const result = await configRepository.updatePopupConfig(body);
+            const result = await configRepo.updatePopupConfig(body);
             return json(200, result, headers);
           }
         }
 
         if (subRoute === "planes") {
-          if (method === "GET") return json(200, await configRepository.getPlanes(), headers);
+          if (method === "GET") return json(200, await configRepo.getPlanes(), headers);
           if (method === "PUT") {
             const body = parseBody(event);
-            const result = await configRepository.updatePlanes(body);
+            const result = await configRepo.updatePlanes(body);
             return json(200, result, headers);
           }
         }
@@ -348,6 +352,66 @@ export function createApiHandler({
           sent: sentCount,
           failed: failedCount,
         }, headers);
+      }
+
+      // --- TEXTOS DE LOS AVISOS PUSH PROGRAMADOS (dias 1, 9 y 24) ---
+      if (routePath === "/admin/push/avisos") {
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+
+        if (method === "GET") {
+          return json(200, {
+            defaults: textosPorDefecto(),
+            avisos: await configRepo.getAvisosPush(),
+          }, headers);
+        }
+
+        if (method === "PUT") {
+          let body;
+          try {
+            body = parseBody(event);
+          } catch {
+            return json(400, { error: "json invalido" }, headers);
+          }
+
+          if (!body || typeof body !== "object" || Array.isArray(body)) {
+            return json(400, { error: "payload invalido" }, headers);
+          }
+
+          const avisos = await configRepo.updateAvisosPush(body);
+          return json(200, { avisos }, headers);
+        }
+      }
+
+      // --- EJECUCION MANUAL DE UN AVISO PUSH (simula el cron del dia elegido) ---
+      if (routePath === "/admin/push/trigger" && method === "POST") {
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+
+        let body;
+        try {
+          body = parseBody(event);
+        } catch {
+          return json(400, { error: "json invalido" }, headers);
+        }
+
+        const dia = Number(body.dia);
+        if (!DIAS_AVISO.includes(dia)) {
+          return json(400, { error: "dia invalido" }, headers);
+        }
+
+        const guardado = await configRepo.getAvisosPush();
+        const textoGuardado = guardado[dia] || {};
+        const texto = {
+          title: body.title === undefined ? textoGuardado.title : body.title,
+          body: body.body === undefined ? textoGuardado.body : body.body,
+        };
+
+        const { enviados, encontrados } = await enviarPush({
+          armarPayload: (customer) => armarPayloadAviso({ dia, customer, texto }),
+        });
+
+        return json(200, { ok: true, dia, enviados, encontrados }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {

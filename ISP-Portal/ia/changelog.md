@@ -1,16 +1,28 @@
+## 2026-09-30
+
+### Notificaciones push: aviso del dia 1, filtro de clientes habilitados y textos editables
+
+- **Nuevo aviso dia 1:** se creo `netlify/functions/cron-facturacion.js` (`schedule: 0 10 1 * *`) que avisa "Facturacion disponible" el primer dia de cada mes. No exige deuda.
+- **Filtro de status:** los tres avisos (dias 1, 9 y 24) solo se envian a clientes habilitados (`active` / `activo` / `enabled`, ver `isServiceEnabled` en `src/lib/utils/customer.js`). Bloqueados, suspendidos y `no_service` no reciben push. Los avisos de vencimiento (9 y 24) ademas siguen exigiendo `debt > 0` o `duedebt > 0`.
+- **Textos editables:** se extrajeron los avisos a `server/lib/notificaciones.js` (`AVISOS`, `DIAS_AVISO`, `armarPayloadAviso`) y se persisten en Netlify Blobs (`config:avisosPush`) a traves de `configRepository`. Texto vacio = texto preestablecido. Endpoints `GET`/`PUT /admin/push/avisos`.
+- **Ejecucion manual desde el panel:** nuevo endpoint `POST /admin/push/trigger` (`{ dia: 1|9|24, title?, body? }`) y card "AVISOS PUSH PROGRAMADOS" en `AdminDashboard.jsx` con un bloque por dia (1/x, 9/x, 24/x): editar titulo/mensaje con el default como placeholder, guardar textos y ejecutar el aviso en el momento.
+- **Refactor:** la logica de envio comun (suscripciones, resumen por DNI, filtro de status, aislamiento de errores) se unifico en `server/lib/pushNotifications.js` (`enviarPushAClientes`), reutilizado por los dos crons y por el trigger manual. `createApiHandler` ahora acepta `configRepo` y `enviarPush` inyectables.
+- **Fix:** en `cron-notificaciones.js` la variable `dni` se usaba fuera de scope en el `catch`, lo que provocaba un `ReferenceError` y abortaba el resto de los envios ante el primer fallo.
+- **Tests:** 61 tests en total. Nuevos: `notificaciones.test.js`, `pushNotifications.test.js`, `cron-facturacion.test.js`, `cron-notificaciones.test.js`, `customer.test.js` y los casos de trigger/avisos en `apiHandler.test.js`.
+
 ## 2026-08-11
 
 ### Ajustes en Reglas de Negocio de Compromisos y Recargos
 
-- **Compromisos de pago en "Días cerrados":**
-  - Los clientes *habilitados* (no suspendidos) ahora pueden solicitar un compromiso de pago incluso si se encuentran entre los días 11 y 25 del mes.
-  - El sistema detecta su estado y les abre la ventana automáticamente proyectándola al ciclo de facturación siguiente (del 26 del mes en curso al 10 del mes próximo).
+- **Compromisos de pago en "Dï¿½as cerrados":**
+  - Los clientes *habilitados* (no suspendidos) ahora pueden solicitar un compromiso de pago incluso si se encuentran entre los dï¿½as 11 y 25 del mes.
+  - El sistema detecta su estado y les abre la ventana automï¿½ticamente proyectï¿½ndola al ciclo de facturaciï¿½n siguiente (del 26 del mes en curso al 10 del mes prï¿½ximo).
 - **Avisos Informativos UX:**
-  - Se añadió una tarjeta amarilla obligatoria en la pantalla de Compromisos de Pago advirtiendo explícitamente: *"Importante: El compromiso tiene un costo de $2000 y en caso de que no se abone en la fecha indicada se abonará + de reconexión"*.
-- **Prevención de Doble Cobro en 2do Vencimiento:**
-  - Se modificó la arquitectura de extracción de facturas (IspRepository.findBillingExtras) para escanear de forma inteligente si ISPCube **ya emitió** un comprobante de "Recargo por Vencimiento".
-  - Si aún **no lo emitió** (y estamos entre el 11 y el 25), el portal suma matemáticamente el costo de 2do vencimiento a la deuda para que el cliente pague el total correcto.
-  - Si ISPCube **ya lo emitió** (por lo que el importe ya viene dentro de la deuda principal), el portal deja de sumarlo por su cuenta. En su lugar, muta la alerta amarilla en el estado de cuenta aclarando: *"Aviso: Su total ya incluye un recargo por 2do vencimiento de .000"*.
+  - Se aï¿½adiï¿½ una tarjeta amarilla obligatoria en la pantalla de Compromisos de Pago advirtiendo explï¿½citamente: *"Importante: El compromiso tiene un costo de $2000 y en caso de que no se abone en la fecha indicada se abonarï¿½ + de reconexiï¿½n"*.
+- **Prevenciï¿½n de Doble Cobro en 2do Vencimiento:**
+  - Se modificï¿½ la arquitectura de extracciï¿½n de facturas (IspRepository.findBillingExtras) para escanear de forma inteligente si ISPCube **ya emitiï¿½** un comprobante de "Recargo por Vencimiento".
+  - Si aï¿½n **no lo emitiï¿½** (y estamos entre el 11 y el 25), el portal suma matemï¿½ticamente el costo de 2do vencimiento a la deuda para que el cliente pague el total correcto.
+  - Si ISPCube **ya lo emitiï¿½** (por lo que el importe ya viene dentro de la deuda principal), el portal deja de sumarlo por su cuenta. En su lugar, muta la alerta amarilla en el estado de cuenta aclarando: *"Aviso: Su total ya incluye un recargo por 2do vencimiento de .000"*.
 
 ## 2026-08-10
 

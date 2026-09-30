@@ -22,6 +22,12 @@ const Switch = ({ checked, onChange, disabled }) => (
   </button>
 );
 
+const AVISO_DIAS = [
+  { dia: 1, etiqueta: "1/x", nombre: "Facturacion disponible" },
+  { dia: 9, etiqueta: "9/x", nombre: "1er vencimiento" },
+  { dia: 24, etiqueta: "24/x", nombre: "2do vencimiento y corte" },
+];
+
 export default function AdminDashboard({ session }) {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({ visits: 0, comprobanteClicks: 0 });
@@ -57,6 +63,14 @@ export default function AdminDashboard({ session }) {
   const [sendingBroadcast, setSendingBroadcast] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState(null);
 
+  // Avisos push programados (dias 1, 9 y 24)
+  const [avisosDefaults, setAvisosDefaults] = useState({});
+  const [draftAvisos, setDraftAvisos] = useState({});
+  const [savingAvisoDia, setSavingAvisoDia] = useState(null);
+  const [savedAvisoDia, setSavedAvisoDia] = useState(null);
+  const [runningAvisoDia, setRunningAvisoDia] = useState(null);
+  const [triggerResult, setTriggerResult] = useState(null);
+
   const [error, setError] = useState("");
 
 
@@ -65,7 +79,7 @@ export default function AdminDashboard({ session }) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [metricsData, costosData, popupData, planesData] = await Promise.all([
+        const [metricsData, costosData, popupData, planesData, avisosData] = await Promise.all([
           adminApi.getMetrics(adminCode).catch(() => ({ visits: 12458, comprobanteClicks: 842 })),
           adminApi.getCostos(adminCode).catch(() => ({ recargoReconexion: 2000, costoCompromiso: 2000, umbralDeudaVencida: 2000 })),
           adminApi.getPopup(adminCode).catch(() => ({ enabled: true, imageUrl: "", linkUrl: "" })),
@@ -73,12 +87,15 @@ export default function AdminDashboard({ session }) {
             { id: "1", velocidad: "100 MB", precio: 28000, descripcion: "Ideal para navegación y redes sociales." },
             { id: "2", velocidad: "200 MB", precio: 31000, descripcion: "Streaming, trabajo y entretenimiento." },
             { id: "3", velocidad: "300 MB", precio: 34000, descripcion: "Mayor velocidad para toda tu casa." }
-          ]))
+          ])),
+          adminApi.getAvisosPush(adminCode).catch(() => ({ defaults: {}, avisos: {} }))
         ]);
         setMetrics(metricsData);
         setCostos(costosData);
         setPopup(popupData);
         setPlanes(planesData);
+        setAvisosDefaults(avisosData?.defaults || {});
+        setDraftAvisos(avisosData?.avisos || {});
       } catch (err) {
         setError("Error al cargar los datos del panel.");
         console.error(err);
@@ -187,6 +204,54 @@ export default function AdminDashboard({ session }) {
       console.error(err);
     } finally {
       setSendingBroadcast(false);
+    }
+  };
+
+  const handleAvisoTextChange = (dia, campo, valor) => {
+    setDraftAvisos((prev) => ({
+      ...prev,
+      [dia]: { title: "", body: "", ...(prev[dia] || {}), [campo]: valor },
+    }));
+  };
+
+  const handleSaveAviso = async (dia) => {
+    setSavingAvisoDia(dia);
+    setError("");
+    try {
+      const res = await adminApi.updateAvisosPush(adminCode, {
+        [dia]: draftAvisos[dia] || { title: "", body: "" },
+      });
+      if (res?.avisos) {
+        setDraftAvisos(res.avisos);
+      }
+      setSavedAvisoDia(dia);
+      setTimeout(() => setSavedAvisoDia(null), 3000);
+    } catch (err) {
+      setError("Error al guardar el texto del aviso.");
+      console.error(err);
+    } finally {
+      setSavingAvisoDia(null);
+    }
+  };
+
+  const handleRunAviso = async (dia) => {
+    setRunningAvisoDia(dia);
+    setTriggerResult(null);
+    setError("");
+    try {
+      const texto = draftAvisos[dia] || { title: "", body: "" };
+      const res = await adminApi.triggerPush(adminCode, {
+        dia,
+        title: texto.title || "",
+        body: texto.body || "",
+      });
+      setTriggerResult({ dia, ...res });
+      setTimeout(() => setTriggerResult(null), 8000);
+    } catch (err) {
+      setError("Error al ejecutar el aviso.");
+      console.error(err);
+    } finally {
+      setRunningAvisoDia(null);
     }
   };
 
@@ -524,7 +589,96 @@ export default function AdminDashboard({ session }) {
         )}
       </div>
 
-      {/* 5. CARD PLANES DISPONIBLES */}
+      {/* 5. CARD AVISOS PUSH PROGRAMADOS */}
+      <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 sm:p-6 shadow-xl mb-6">
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-white tracking-wide mb-1">AVISOS PUSH PROGRAMADOS</h2>
+          <p className="text-sm text-slate-400">Textos de los avisos automaticos y ejecucion manual de cada uno. Si dejas un campo vacio se usa el texto preestablecido.</p>
+        </div>
+
+        {triggerResult && (
+          <div className={`text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border ${
+            triggerResult.encontrados === 0
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+              : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+          }`}>
+            {triggerResult.encontrados === 0
+              ? "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
+              : `Aviso ${triggerResult.dia}/x enviado a ${triggerResult.enviados} de ${triggerResult.encontrados} cliente${triggerResult.encontrados === 1 ? "" : "s"} suscripto${triggerResult.encontrados === 1 ? "" : "s"}.`}
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {AVISO_DIAS.map(({ dia, etiqueta, nombre }) => {
+            const draft = draftAvisos[dia] || { title: "", body: "" };
+            const defaultTitle = avisosDefaults[dia]?.title || "";
+            const defaultBody = avisosDefaults[dia]?.body || "";
+
+            return (
+              <div key={dia} className="bg-[#151D2D] border border-white/5 rounded-xl p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-red-500/15 text-red-400 text-xs font-bold px-2.5 py-1 rounded-md tracking-wider shrink-0">{etiqueta}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{nombre}</p>
+                      <p className="text-xs text-slate-500">
+                        Automatico: dia {dia} de cada mes. Se envia solo a clientes habilitados{dia !== 1 ? " con deuda" : ""}.
+                      </p>
+                    </div>
+                  </div>
+                  {savedAvisoDia === dia && (
+                    <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded animate-in fade-in shrink-0">Texto guardado</span>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Titulo</label>
+                    <input
+                      type="text"
+                      className="w-full bg-[#080D1C] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-red-500 min-h-[44px]"
+                      value={draft.title}
+                      onChange={(e) => handleAvisoTextChange(dia, "title", e.target.value)}
+                      placeholder={defaultTitle}
+                      maxLength={60}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Mensaje</label>
+                    <textarea
+                      className="w-full bg-[#080D1C] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-red-500 min-h-[90px] resize-y"
+                      value={draft.body}
+                      onChange={(e) => handleAvisoTextChange(dia, "body", e.target.value)}
+                      placeholder={defaultBody}
+                      maxLength={300}
+                    />
+                    <p className="text-xs text-slate-500 mt-1">{draft.body.length}/300 caracteres</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3">
+                  <button
+                    onClick={() => handleSaveAviso(dia)}
+                    disabled={savingAvisoDia !== null}
+                    className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-300 bg-white/5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50 min-h-[44px]"
+                  >
+                    {savingAvisoDia === dia ? "Guardando..." : "Guardar textos"}
+                  </button>
+                  <button
+                    onClick={() => handleRunAviso(dia)}
+                    disabled={runningAvisoDia !== null}
+                    className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 min-h-[44px]"
+                  >
+                    {runningAvisoDia === dia ? "Enviando..." : `Ejecutar ${etiqueta}`}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 6. CARD PLANES DISPONIBLES */}
       <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 sm:p-6 shadow-xl mb-8">
         <div className="mb-6">
           <h2 className="text-lg font-bold text-white tracking-wide mb-1">PLANES DISPONIBLES</h2>

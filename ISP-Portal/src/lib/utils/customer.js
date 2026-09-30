@@ -1,9 +1,21 @@
 import { formatMoney } from "./format.js";
 
-export function getServiceStatus(status) {
-  const normalizedStatus = (status || "").toLowerCase();
+const ACTIVE_STATUSES = ["active", "activo", "enabled"];
+const SUSPENDED_STATUSES = ["blocked", "bloqueado", "block", "suspended", "suspendido", "disabled"];
+const NO_SERVICE_STATUSES = ["no_service"];
 
-  if (["active", "activo", "enabled"].includes(normalizedStatus)) {
+export function normalizeServiceStatus(status) {
+  return String(status || "").trim().toLowerCase();
+}
+
+export function isServiceEnabled(status) {
+  return ACTIVE_STATUSES.includes(normalizeServiceStatus(status));
+}
+
+export function getServiceStatus(status) {
+  const normalizedStatus = normalizeServiceStatus(status);
+
+  if (ACTIVE_STATUSES.includes(normalizedStatus)) {
     return {
       label: "Activo",
       color: "#10b981",
@@ -12,7 +24,7 @@ export function getServiceStatus(status) {
     };
   }
 
-  if (["blocked", "bloqueado", "block", "suspended", "suspendido", "disabled"].includes(normalizedStatus)) {
+  if (SUSPENDED_STATUSES.includes(normalizedStatus)) {
     return {
       label: "Suspendido",
       color: "#ef4444",
@@ -21,7 +33,7 @@ export function getServiceStatus(status) {
     };
   }
 
-  if (["no_service"].includes(normalizedStatus)) {
+  if (NO_SERVICE_STATUSES.includes(normalizedStatus)) {
     return {
       label: "Sin servicio",
       color: "#f59e0b",
