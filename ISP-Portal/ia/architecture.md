@@ -52,6 +52,10 @@
 ### Backend serverless
 
 - `netlify/functions/api.js`: adapta la misma logica de negocio al runtime de Netlify Functions.
+- `netlify/functions/cron-facturacion.js`: cron programado (`0 10 1 * *`), aviso de facturacion disponible el dia 1.
+- `netlify/functions/cron-notificaciones.js`: cron programado (`0 10 9,24 * *`), avisos de 1er y 2do vencimiento.
+- `server/lib/notificaciones.js`: definicion de los avisos (dia, textos por defecto, regla de deuda) y construccion del payload.
+- `server/lib/pushNotifications.js`: envio comun (`enviarPushAClientes`) a suscriptos con status habilitado, compartido por los dos crons y por el trigger manual.
 
 ### Logica de negocio
 
@@ -86,6 +90,15 @@
 4. Ejecuta `PUT /customers/{id}` en el proveedor.
 5. Invalida cache del resumen por DNI.
 6. Devuelve el cliente saneado con el email actualizado.
+
+### Aviso push programado (dias 1, 9 y 24)
+
+1. Netlify ejecuta la function segun su `config.schedule` (10:00 AM del dia 1, 9 o 24).
+2. Se leen todas las suscripciones (`push:subscriptions` en Redis o Netlify Blobs).
+3. Por cada DNI se consulta el resumen contra ISPCube y se descarta si `status` no esta habilitado (`active` / `activo` / `enabled`).
+4. `armarPayloadAviso` aplica la regla de deuda (solo dias 9 y 24) y el texto guardado en `config:avisosPush`, con el texto por defecto de `AVISOS` como fallback.
+5. Se envia con `web-push`; un error en una suscripcion no detiene el resto del recorrido.
+6. El mismo flujo se dispara a demanda desde el panel admin via `POST /admin/push/trigger`.
 
 ## Restricciones arquitectonicas actuales
 

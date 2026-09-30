@@ -56,6 +56,7 @@
 - `dist/` contiene el artefacto generado del frontend.
 - `/api/*` redirige a `/.netlify/functions/api/:splat`.
 - Variables de entorno se configuran en el dashboard de Netlify, nunca en el repo.
+- `netlify/functions/` debe contener solo functions reales (`api.js`, `cron-facturacion.js`, `cron-notificaciones.js`). Netlify empaqueta todo `.js` del directorio y rechaza nombres con puntos, por lo que un archivo `*.test.js` ahi dentro rompe el deploy. Los tests de los crons viven en `ISP-Portal/tests/`.
 
 ## Seguridad actual
 

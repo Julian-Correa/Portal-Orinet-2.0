@@ -95,12 +95,15 @@ El PUT de email valida `Origin` contra `CORS_ORIGIN`. Los errores del proveedor 
       app/          # composicion compartida de runtime
       config/       # entorno y validaciones
       http/         # handler HTTP canonico
-      lib/          # cache Redis/memoria
-      repositories/ # acceso a ISPCube
+      lib/          # cache Redis/memoria, avisos y envio push
+      repositories/ # acceso a ISPCube y Netlify Blobs
       services/     # reglas de negocio
     netlify/functions/
-      api.js        # entrypoint serverless fino
-    ia/             # documentacion tecnica para continuidad
+      api.js                 # entrypoint serverless fino
+      cron-facturacion.js    # cron del dia 1
+      cron-notificaciones.js # cron de los dias 9 y 24
+    tests/            # tests de Vitest (nunca dentro de netlify/functions)
+    ia/               # documentacion tecnica para continuidad
 
 Flujo actual:
 
@@ -114,6 +117,7 @@ Flujo actual:
 
 - Tests unitarios para `customerSummaryService` e `ispRepository`
 - Tests de endpoints sobre Express adapter y handler canonico
+- Tests de los avisos y los crons en `server/lib/*.test.js` y `tests/cron-*.test.js`
 - CI en GitHub Actions con `lint`, `test` y `build`
 
 ## Deploy en Netlify

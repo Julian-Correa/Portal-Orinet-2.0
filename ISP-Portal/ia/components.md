@@ -9,10 +9,11 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 - `Navbar`: Barra de navegación con logo y enlaces contextuales (cliente o admin).
 - `PopupImage`: popup opcional de comunicacion visual.
 - `LoginScreen`: ingreso por DNI y primer fetch al backend.
-- `AdminDashboard`: Panel administrativo con configuración de costos, métricas y planes.
+- `AdminDashboard`: Panel administrativo con configuración de costos, métricas, planes, aviso general y avisos push programados (texto editable + ejecución manual de los días 1/x, 9/x y 24/x).
 - `ProfileScreen`: dashboard principal del cliente.
 - `PlanesScreen`, `ServiciosScreen`, `FacturacionScreen`, `NosotrosScreen`: Vistas secundarias modulares.
 - `EmailCard`: alta/edicion del email de facturacion.
+- `PushNotificationBanner`: pide permiso de notificaciones y registra la suscripcion push.
 - `Switch` (dentro de AdminDashboard): toggle accesible para configuraciones.
 - `OriNetLogo`: logo presentacional.
 - `DownloadIcon`, `LogoutIcon`, `WhatsAppIcon`: iconos presentacionales.
@@ -20,8 +21,9 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 ### Librerias frontend
 
 - `src/lib/api/portalApi.js`: cliente HTTP para la API del portal.
+- `src/lib/api/adminApi.js`: cliente HTTP del panel admin (config, metricas, planes, avisos y push).
 - `src/lib/config/portalConfig.js`: configuracion del portal.
-- `src/lib/utils/customer.js`: utilidades de cliente.
+- `src/lib/utils/customer.js`: utilidades de cliente, incluye `isServiceEnabled` (status habilitado usado por los avisos push).
 - `src/lib/utils/format.js`: utilidades de formato.
 
 ### Estado actual
@@ -42,6 +44,8 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 
 - `server/index.js`: compone el backend local.
 - `netlify/functions/api.js`: entrada serverless.
+- `netlify/functions/cron-facturacion.js`: cron del dia 1 (aviso de facturacion disponible).
+- `netlify/functions/cron-notificaciones.js`: cron de los dias 9 y 24 (avisos de vencimiento).
 
 ### HTTP
 
@@ -71,6 +75,12 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 ### Librerias tecnicas
 
 - `CacheClient`: abstraccion minima entre Redis y cache en memoria.
+- `notificaciones.js`: `AVISOS` (dias 1, 9 y 24 con textos por defecto) y `armarPayloadAviso` (regla de deuda + texto editado o default).
+- `pushNotifications.js`: `enviarPushAClientes` recorre suscripciones, filtra por status habilitado y envia con `web-push`.
+
+### Persistencia de configuracion
+
+- `configRepository`: costos, popup, planes y textos de los avisos push (`config:avisosPush` en Netlify Blobs).
 
 ## Acoplamientos importantes
 

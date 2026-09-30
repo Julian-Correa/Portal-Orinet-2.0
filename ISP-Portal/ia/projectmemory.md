@@ -24,6 +24,7 @@
 - El repo usa Netlify Blobs para persistencia de configuración y métricas (con un adapter local para desarrollo vía `npm run dev`); no hay ORM ni base de datos relacional tradicional.
 - La sesión (tanto de cliente como de administrador) se persiste en `sessionStorage` para sobrevivir a recargas de página.
 - La documentacion tecnica vive en `ia/` y debe mantenerse actualizada con cada cambio relevante.
+- `netlify/functions/` debe contener solo functions reales. Netlify empaqueta todo `.js` del directorio y rechaza nombres con puntos, asi que un `*.test.js` ahi dentro rompe el deploy (los tests de los crons viven en `tests/`).
 
 ## Hotspots tecnicos
 

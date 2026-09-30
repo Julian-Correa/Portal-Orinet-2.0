@@ -68,6 +68,7 @@ Estados: `[ ]` (Pendiente) · `[~]` (En proceso) · `[x]` (Hecho)
   - Al cargarlos como "Artículos extra en facturación", ISPCube genera facturas (Bills) por estos conceptos.
   - Se implementó `findActiveExtras` en `ispRepository.js` para consultar `/bills/bills_list`, filtrando facturas recientes/impagas y extrayendo los items que no sean el abono de internet (`plan_id === null` y tengan `extra_id`).
   - Se actualizó el backend, la caché de sesión y la vista `/servicios` para mostrar dinámicamente estos extras facturados junto a su precio correspondiente.
+- [x] **Fix deploy Netlify (2026-09-30):** los tests de los crons estaban dentro de `netlify/functions/` y Netlify empaqueta todo `.js` de ese directorio como function (los puntos del nombre rompen el build). Se movieron a `ISP-Portal/tests/` con sus imports relativos corregidos; `netlify/functions/` ahora solo tiene `api.js`, `cron-facturacion.js` y `cron-notificaciones.js`. Documentado en `ia/infrastructure.md` y `ia/projectmemory.md`.
 
 (Fin del scope actual. Portal versión estable con Compromisos de Pago y Extras integrados.)
 ## 9. Notificaciones Push (Web Push) & Automatizacion

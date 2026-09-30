@@ -60,6 +60,18 @@ Dato auxiliar del proveedor. Se usan sobre todo:
 - Token del proveedor: `isp:token`
 - Resumen por DNI: `isp:summary:{dni}`
 
+## Netlify Blobs keys
+
+Store `orinet-config`:
+
+- `config:costos`, `config:popup`, `config:planes`: configuracion editable del panel admin.
+- `config:avisosPush`: textos editables de los avisos automaticos (dias 1, 9 y 24). Vacio = texto por defecto.
+- `metrics:visits`, `metrics:comprobante-clicks`: metricas del panel.
+
+Store `orinet-push`:
+
+- `push:subscriptions`: suscripciones web push (`{ dni, endpoint, keys, createdAt }`); tambien se replica como hash en Redis si hay cache.
+
 ## Persistencia real
 
 - Redis: opcional, externa al repo.

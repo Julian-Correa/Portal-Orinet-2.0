@@ -9,6 +9,7 @@
 - **Refactor:** la logica de envio comun (suscripciones, resumen por DNI, filtro de status, aislamiento de errores) se unifico en `server/lib/pushNotifications.js` (`enviarPushAClientes`), reutilizado por los dos crons y por el trigger manual. `createApiHandler` ahora acepta `configRepo` y `enviarPush` inyectables.
 - **Fix:** en `cron-notificaciones.js` la variable `dni` se usaba fuera de scope en el `catch`, lo que provocaba un `ReferenceError` y abortaba el resto de los envios ante el primer fallo.
 - **Tests:** 61 tests en total. Nuevos: `notificaciones.test.js`, `pushNotifications.test.js`, `cron-facturacion.test.js`, `cron-notificaciones.test.js`, `customer.test.js` y los casos de trigger/avisos en `apiHandler.test.js`.
+- **Fix de deploy:** Netlify empaqueta *todos* los `.js` de `netlify/functions` como functions, y los nombres no pueden contener puntos. Los tests de los crons se movieron de `netlify/functions/` a `ISP-Portal/tests/` (quedaron solo `api.js`, `cron-facturacion.js` y `cron-notificaciones.js`). Convencion: nunca dejar archivos que no sean functions en ese directorio.
 
 ## 2026-08-11
 
