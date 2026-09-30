@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import handler, { config } from "./cron-facturacion.js";
+import handler, { config } from "../netlify/functions/cron-facturacion.js";
 
 const { enviarPushAClientes, getAvisosPush } = vi.hoisted(() => ({
   enviarPushAClientes: vi.fn(),
   getAvisosPush: vi.fn(),
 }));
 
-vi.mock("../../server/lib/pushNotifications.js", () => ({ enviarPushAClientes }));
+vi.mock("../server/lib/pushNotifications.js", () => ({ enviarPushAClientes }));
 
-vi.mock("../../server/repositories/configRepository.js", () => ({
+vi.mock("../server/repositories/configRepository.js", () => ({
   configRepository: { getAvisosPush },
 }));
 
