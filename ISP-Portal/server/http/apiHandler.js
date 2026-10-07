@@ -303,7 +303,7 @@ export function createApiHandler({
       }
 
       // --- ENDPOINTS DE METRICAS ---
-      if (routePath === \"/admin/metrics\" && method === \"GET\") {
+      if (routePath === "/admin/metrics" && method === "GET") {
         const adminError = validateAdmin(event, headers);
         if (adminError) return adminError;
         return json(200, await metricsRepository.getMetrics(), headers);
