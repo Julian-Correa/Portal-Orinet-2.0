@@ -31,6 +31,7 @@ const AVISO_DIAS = [
 export default function AdminDashboard({ session }) {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({ visits: 0, comprobanteClicks: 0 });
+  const [pushSubscribersCount, setPushSubscribersCount] = useState(null);
   
   // Costos State
   const [costos, setCostos] = useState({ 
@@ -79,7 +80,7 @@ export default function AdminDashboard({ session }) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [metricsData, costosData, popupData, planesData, avisosData] = await Promise.all([
+        const [metricsData, costosData, popupData, planesData, avisosData, pushCountData] = await Promise.all([
           adminApi.getMetrics(adminCode).catch(() => ({ visits: 12458, comprobanteClicks: 842 })),
           adminApi.getCostos(adminCode).catch(() => ({ recargoReconexion: 2000, costoCompromiso: 2000, umbralDeudaVencida: 2000 })),
           adminApi.getPopup(adminCode).catch(() => ({ enabled: true, imageUrl: "", linkUrl: "" })),
@@ -88,7 +89,8 @@ export default function AdminDashboard({ session }) {
             { id: "2", velocidad: "200 MB", precio: 31000, descripcion: "Streaming, trabajo y entretenimiento." },
             { id: "3", velocidad: "300 MB", precio: 34000, descripcion: "Mayor velocidad para toda tu casa." }
           ])),
-          adminApi.getAvisosPush(adminCode).catch(() => ({ defaults: {}, avisos: {} }))
+          adminApi.getAvisosPush(adminCode).catch(() => ({ defaults: {}, avisos: {} })),
+          adminApi.getPushSubscriptionsCount(adminCode).catch(() => ({ count: 0 })),
         ]);
         setMetrics(metricsData);
         setCostos(costosData);
@@ -96,6 +98,7 @@ export default function AdminDashboard({ session }) {
         setPlanes(planesData);
         setAvisosDefaults(avisosData?.defaults || {});
         setDraftAvisos(avisosData?.avisos || {});
+        setPushSubscribersCount(pushCountData?.count ?? 0);
       } catch (err) {
         setError("Error al cargar los datos del panel.");
         console.error(err);
@@ -308,7 +311,7 @@ export default function AdminDashboard({ session }) {
       {/* 2. CARD DASHBOARD */}
       <div className="bg-[#111827] border border-white/5 rounded-2xl p-4 sm:p-6 shadow-xl mb-6">
         <h2 className="text-lg font-bold text-white mb-6 tracking-wide">DASHBOARD</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-[#151D2D] rounded-xl p-5 border border-white/5 flex flex-col justify-center transition-all hover:bg-[#1c263b]">
             <div className="flex items-center gap-3 mb-2">
               <div className="bg-emerald-500/10 text-emerald-400 p-2 rounded-lg shrink-0">
@@ -329,6 +332,25 @@ export default function AdminDashboard({ session }) {
             </div>
             <p className="text-3xl font-bold text-white mb-1">{metrics.comprobanteClicks.toLocaleString('es-AR')}</p>
             <p className="text-xs text-emerald-400 font-medium">+12% vs. mes anterior</p>
+          </div>
+
+          <div className="bg-[#151D2D] rounded-xl p-5 border border-white/5 flex flex-col justify-center transition-all hover:bg-[#1c263b]">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-violet-500/10 text-violet-400 p-2 rounded-lg shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              </div>
+              <p className="text-sm font-semibold text-slate-300 tracking-wider">NOTIFICACIONES ACTIVAS</p>
+            </div>
+            <p className="text-3xl font-bold text-white mb-1">
+              {pushSubscribersCount === null ? (
+                <span className="inline-block w-16 h-8 bg-white/10 rounded animate-pulse" />
+              ) : (
+                pushSubscribersCount.toLocaleString('es-AR')
+              )}
+            </p>
+            <p className="text-xs text-violet-400 font-medium">
+              {pushSubscribersCount === null ? "" : `usuario${pushSubscribersCount !== 1 ? "s" : ""} suscripto${pushSubscribersCount !== 1 ? "s" : ""}`}
+            </p>
           </div>
         </div>
       </div>

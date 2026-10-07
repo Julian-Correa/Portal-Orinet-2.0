@@ -184,6 +184,23 @@ Aviso general a todas las suscripciones, sin filtro de cliente.
 
 { "ok": true, "subscribers": 40, "sent": 38, "failed": 2 }
 
+### `GET /admin/push/subscriptions/count`
+
+Devuelve la cantidad de usuarios que tienen notificaciones push activas en el momento de la consulta.
+
+#### Reglas
+
+- Requiere header `X-Admin-Code`.
+- Cuenta todas las suscripciones almacenadas en `push:subscriptions` (Redis o Blobs). No valida si siguen activas en el navegador.
+
+#### Respuesta exitosa `200`
+
+{ "count": 42 }
+
+#### Errores esperados
+
+- `401`: `no autorizado`
+
 ## Endpoints externos usados (ISPCube)
 
 - `POST /sanctum/token`

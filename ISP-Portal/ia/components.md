@@ -9,7 +9,7 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 - `Navbar`: Barra de navegación con logo y enlaces contextuales (cliente o admin).
 - `PopupImage`: popup opcional de comunicacion visual.
 - `LoginScreen`: ingreso por DNI y primer fetch al backend.
-- `AdminDashboard`: Panel administrativo con configuración de costos, métricas, planes, aviso general y avisos push programados (texto editable + ejecución manual de los días 1/x, 9/x y 24/x).
+- `AdminDashboard`: Panel administrativo con configuración de costos, métricas, planes, aviso general, avisos push programados (texto editable + ejecución manual de los días 1/x, 9/x y 24/x) y card de notificaciones activas (usuarios suscriptos a push en tiempo real).
 - `ProfileScreen`: dashboard principal del cliente.
 - `PlanesScreen`, `ServiciosScreen`, `FacturacionScreen`, `NosotrosScreen`: Vistas secundarias modulares.
 - `EmailCard`: alta/edicion del email de facturacion.
@@ -21,7 +21,7 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 ### Librerias frontend
 
 - `src/lib/api/portalApi.js`: cliente HTTP para la API del portal.
-- `src/lib/api/adminApi.js`: cliente HTTP del panel admin (config, metricas, planes, avisos y push).
+- `src/lib/api/adminApi.js`: cliente HTTP del panel admin (config, metricas, planes, avisos, push y count de suscriptores).
 - `src/lib/config/portalConfig.js`: configuracion del portal.
 - `src/lib/utils/customer.js`: utilidades de cliente, incluye `isServiceEnabled` (status habilitado usado por los avisos push).
 - `src/lib/utils/format.js`: utilidades de formato.

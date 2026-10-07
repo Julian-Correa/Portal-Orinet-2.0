@@ -110,5 +110,17 @@ export const adminApi = {
       body: JSON.stringify({ dia, title, body }),
     });
     return handleResponse(res);
-  }
+  },
+
+  /**
+   * Devuelve la cantidad de usuarios con notificaciones push activas.
+   * @param {string} adminCode
+   * @returns {Promise<{ count: number }>}
+   */
+  async getPushSubscriptionsCount(adminCode) {
+    const res = await fetch(`${PORTAL_API_BASE}/admin/push/subscriptions/count`, {
+      headers: getHeaders(adminCode),
+    });
+    return handleResponse(res);
+  },
 };

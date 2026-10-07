@@ -1,3 +1,11 @@
+## 2026-10-07
+
+### Stat card de notificaciones activas en el panel admin
+
+- **Nuevo endpoint** `GET /admin/push/subscriptions/count` (requiere `X-Admin-Code`): devuelve `{ count: N }` con la cantidad de usuarios que tienen notificaciones push activas. Reutiliza `cache.getAllSubscriptions()`, el mismo mecanismo del broadcast.
+- **Nuevo metodo** `adminApi.getPushSubscriptionsCount(adminCode)` en `src/lib/api/adminApi.js`.
+- **AdminDashboard.jsx**: se agrego la card "NOTIFICACIONES ACTIVAS" al grid de DASHBOARD. El grid paso de 2 a 3 columnas (`sm:grid-cols-3`). El count se carga en paralelo junto con el resto de datos del `useEffect` inicial. Mientras carga muestra un skeleton animado. Debajo del numero muestra "usuario/s suscripto/s" con concordancia singular/plural. El dato es en tiempo real al momento de abrir el panel.
+
 ## 2026-09-30
 
 ### Notificaciones push: aviso del dia 1, filtro de clientes habilitados y textos editables

@@ -303,10 +303,20 @@ export function createApiHandler({
       }
 
       // --- ENDPOINTS DE METRICAS ---
-      if (routePath === "/admin/metrics" && method === "GET") {
+      if (routePath === \"/admin/metrics\" && method === \"GET\") {
         const adminError = validateAdmin(event, headers);
         if (adminError) return adminError;
         return json(200, await metricsRepository.getMetrics(), headers);
+      }
+
+      if (routePath === "/admin/push/subscriptions/count" && method === "GET") {
+        // Devuelve la cantidad de usuarios que tienen notificaciones push activas.
+        // Utiliza el mismo almacenamiento de suscripciones que el broadcast.
+        const adminError = validateAdmin(event, headers);
+        if (adminError) return adminError;
+        const cache = await getCache();
+        const subscriptions = await cache.getAllSubscriptions();
+        return json(200, { count: subscriptions.length }, headers);
       }
 
       if (routePath === "/admin/push/broadcast" && method === "POST") {
