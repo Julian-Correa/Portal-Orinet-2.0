@@ -28,20 +28,28 @@ export async function enParaleloLimitado(items, limite, tarea) {
 // `deadlineMs = 0` significa sin limite (crons). Los endpoints dentro de la
 // function api (limite de 10s en Netlify) pasan un presupuesto acotado para
 // responder resultado parcial antes de que el gateway corte con 504.
-export async function enviarPushAClientes({ armarPayload, concurrencia = 5, deadlineMs = 0 }) {
+// `exceptoDnis`: suscriptores que ya recibieron este aviso (re-ejecucion sin duplicar).
+export async function enviarPushAClientes({
+  armarPayload,
+  concurrencia = 5,
+  deadlineMs = 0,
+  exceptoDnis = [],
+}) {
   const cache = await getCache();
   const subscriptions = await cache.getAllSubscriptions();
 
   if (subscriptions.length === 0) {
-    return { enviados: 0, encontrados: 0, pendientes: 0, completo: true };
+    return { enviados: 0, encontrados: 0, pendientes: 0, completo: true, enviadosDnis: [] };
   }
 
   const customerSummaryService = await getCustomerSummaryService();
 
+  const exceptos = exceptoDnis instanceof Set ? exceptoDnis : new Set(exceptoDnis || []);
   const inicio = Date.now();
   let enviados = 0;
   let procesadas = 0;
   let cortado = false;
+  const enviadosDnis = [];
 
   await enParaleloLimitado(subscriptions, concurrencia, async (sub) => {
     if (deadlineMs > 0 && Date.now() - inicio >= deadlineMs) {
@@ -51,6 +59,10 @@ export async function enviarPushAClientes({ armarPayload, concurrencia = 5, dead
 
     const { dni, subscription } = sub;
     try {
+      if (exceptos.has(dni)) {
+        return; // Ya notificado en una ejecucion anterior del mes
+      }
+
       const summary = await customerSummaryService.getSummaryByDni(dni);
 
       if (!summary || summary.error) {
@@ -70,6 +82,7 @@ export async function enviarPushAClientes({ armarPayload, concurrencia = 5, dead
 
       await webpush.sendNotification(subscription, JSON.stringify(payload));
       enviados++;
+      enviadosDnis.push(dni);
     } catch (err) {
       console.error(`Error enviando push a dni ${dni}:`, err);
     } finally {
@@ -84,5 +97,6 @@ export async function enviarPushAClientes({ armarPayload, concurrencia = 5, dead
     encontrados: subscriptions.length,
     pendientes,
     completo: !cortado && pendientes === 0,
+    enviadosDnis,
   };
 }

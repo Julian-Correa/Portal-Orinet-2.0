@@ -72,11 +72,21 @@ describe("apiHandler - avisos push", () => {
       getAvisosPush: vi.fn().mockResolvedValue({}),
       updateAvisosPush: vi.fn(),
     };
+    const pushRunsRepo = {
+      getRun: vi.fn().mockResolvedValue({ mes: "2026-10", enviados: [] }),
+      registrarEnviados: vi.fn(),
+    };
     const enviarPush = vi.fn(async ({ armarPayload }) => {
       const payload = armarPayload({ status: "active", debt: "500" });
       const enviados = payload ? 1 : 0;
       const pendientes = 2 - enviados;
-      return { enviados, encontrados: 2, pendientes, completo: pendientes === 0 };
+      return {
+        enviados,
+        encontrados: 2,
+        pendientes,
+        completo: pendientes === 0,
+        enviadosDnis: payload ? ["20111222"] : [],
+      };
     });
 
     const handler = createApiHandler({
@@ -84,15 +94,16 @@ describe("apiHandler - avisos push", () => {
       getHealthStatus: async () => ({ ok: true, redis: false }),
       configRepo,
       enviarPush,
+      pushRunsRepo,
     });
 
-    return { handler, configRepo, enviarPush };
+    return { handler, configRepo, enviarPush, pushRunsRepo };
   }
 
   const adminHeaders = () => ({ "x-admin-code": env.adminAccessCode });
 
   it("ejecuta manualmente el aviso de un dia con el texto guardado", async () => {
-    const { handler, configRepo, enviarPush } = createPushHandler();
+    const { handler, configRepo, enviarPush, pushRunsRepo } = createPushHandler();
     configRepo.getAvisosPush.mockResolvedValue({ 9: { title: "Titulo guardado", body: "Mensaje guardado" } });
 
     const response = await handler({
@@ -103,7 +114,20 @@ describe("apiHandler - avisos push", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body)).toEqual({ ok: true, dia: 9, enviados: 1, encontrados: 2, pendientes: 1, completo: false });
+    expect(JSON.parse(response.body)).toEqual({
+      ok: true,
+      dia: 9,
+      enviados: 1,
+      encontrados: 2,
+      pendientes: 1,
+      completo: false,
+      yaEnviados: 1,
+    });
+
+    // Reanuda desde el registro del mes y persiste los nuevos enviados
+    expect(pushRunsRepo.getRun).toHaveBeenCalledWith(9);
+    expect(enviarPush.mock.calls[0][0].exceptoDnis).toEqual([]);
+    expect(pushRunsRepo.registrarEnviados).toHaveBeenCalledWith(9, ["20111222"]);
 
     const { armarPayload } = enviarPush.mock.calls[0][0];
     expect(armarPayload({ debt: "100" })).toEqual({
@@ -131,6 +155,25 @@ describe("apiHandler - avisos push", () => {
       body: "Mensaje nuevo",
       url: "/facturacion",
     });
+  });
+
+  it("reanuda sin duplicar: excluye a los DNI ya notificados este mes", async () => {
+    const { handler, enviarPush, pushRunsRepo } = createPushHandler();
+    pushRunsRepo.getRun.mockResolvedValue({ mes: "2026-10", enviados: ["20111222", "20999888"] });
+
+    const response = await handler({
+      path: "/api/admin/push/trigger",
+      httpMethod: "POST",
+      headers: adminHeaders(),
+      body: JSON.stringify({ dia: 24 }),
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(enviarPush.mock.calls[0][0].exceptoDnis).toEqual(["20111222", "20999888"]);
+
+    const body = JSON.parse(response.body);
+    // yaEnviados = 2 del mes + 1 del lote actual
+    expect(body.yaEnviados).toBe(3);
   });
 
   it("valida el codigo admin y el dia", async () => {

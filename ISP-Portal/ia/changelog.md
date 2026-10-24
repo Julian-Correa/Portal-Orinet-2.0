@@ -1,5 +1,14 @@
 ## 2026-10-24
 
+### Cola de avisos push: sin duplicados y auto-completado hasta agotar suscriptos
+
+- **Problema:** cada ejecucion del trigger reenviaba a todos los suscriptos sin memoria de a quien ya se le habia enviado, y con 61 suscriptos el lote no alcanzaba a completarse dentro de la ventana de 10s de Netlify.
+- **Registro por mes (`server/repositories/pushRunsRepository.js`, nuevo):** guarda en Netlify Blobs (store `orinet-push`, clave `push:run:{dia}`) que DNI ya recibio cada aviso. La clave incluye el mes (`YYYY-MM`) y se resetea automaticamente al cambiar de mes. API: `getRun(dia)` devuelve `{ mes, enviados }`, `registrarEnviados(dia, dnis)` hace merge y persiste.
+- **Reanudacion sin duplicar (`pushNotifications.js`, `apiHandler.js`, los 2 crons):** `enviarPushAClientes` acepta `exceptoDnis` (se saltean antes de consultar a ISPCube, sin costo de tiempo) y devuelve `enviadosDnis`. El trigger y ambos cron leen el run antes de enviar y registran los enviados despues: re-ejecutar un aviso, o que el cron corra tras una ejecucion manual, solo envia a quienes faltan o son nuevos suscriptos.
+- **Auto-cadena de lotes (`AdminDashboard.jsx`):** `handleRunAviso` llama al trigger en loop: cada lote corre hasta `PUSH_DEADLINE_MS` (7s), espera 1.5s y re-ejecuta hasta que `completo: true` (maximo 100 lotes). El cartel muestra progreso en vivo ("Notificados este mes: X de Y") y al final informa el total del mes.
+- **Nuevo campo en la respuesta del trigger:** `yaEnviados` (registros del mes + enviados del lote actual).
+- **Tests:** 64/64. Nuevos: `exceptoDnis` en `pushNotifications.test.js`, reanudacion + `registrarEnviados` en `apiHandler.test.js`; mock de `pushRunsRepository` en ambos tests de cron.
+
 ### Fix: 504 en ejecucion manual de avisos y broadcast push
 
 - **Problema:** `POST /admin/push/trigger` y `POST /admin/push/broadcast` corren dentro de la function `api` de Netlify (limite 10s). Procesaban las suscripciones secuencialmente y por cada una consultaban ISPCube (5-6 llamadas HTTP cuando no hay cache), por lo que el gateway cortaba la request con **504 Gateway Timeout** antes de terminar.

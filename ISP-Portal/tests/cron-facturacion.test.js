@@ -12,6 +12,13 @@ vi.mock("../server/repositories/configRepository.js", () => ({
   configRepository: { getAvisosPush },
 }));
 
+vi.mock("../server/repositories/pushRunsRepository.js", () => ({
+  pushRunsRepository: {
+    getRun: vi.fn().mockResolvedValue({ mes: "2026-01", enviados: [] }),
+    registrarEnviados: vi.fn(),
+  },
+}));
+
 describe("cron-facturacion (aviso 1er dia de cada mes)", () => {
   beforeEach(() => {
     vi.clearAllMocks();

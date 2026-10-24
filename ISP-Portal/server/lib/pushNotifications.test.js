@@ -51,7 +51,7 @@ describe("enviarPushAClientes", () => {
       { endpoint: "https://push/20111222" },
       JSON.stringify(payloadDePrueba())
     );
-    expect(resultado).toEqual({ enviados: 1, encontrados: 1, pendientes: 0, completo: true });
+    expect(resultado).toEqual({ enviados: 1, encontrados: 1, pendientes: 0, completo: true, enviadosDnis: ["20111222"] });
   });
 
   it.each(["blocked", "suspendido", "disabled", "no_service"])(
@@ -65,7 +65,7 @@ describe("enviarPushAClientes", () => {
 
       expect(armarPayload).not.toHaveBeenCalled();
       expect(sendNotification).not.toHaveBeenCalled();
-      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
+      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true, enviadosDnis: [] });
     }
   );
 
@@ -77,7 +77,7 @@ describe("enviarPushAClientes", () => {
       const resultado = await enviarPushAClientes({ armarPayload });
 
       expect(sendNotification).not.toHaveBeenCalled();
-      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
+      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true, enviadosDnis: [] });
     });
 
   it("saltea suscripciones sin resumen valido", async () => {
@@ -88,7 +88,7 @@ describe("enviarPushAClientes", () => {
     const resultado = await enviarPushAClientes({ armarPayload });
 
     expect(sendNotification).not.toHaveBeenCalled();
-    expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
+    expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true, enviadosDnis: [] });
   });
 
   it("un fallo en una suscripcion no corta el resto del envio", async () => {
@@ -108,7 +108,7 @@ describe("enviarPushAClientes", () => {
       { endpoint: "https://push/20999888" },
       JSON.stringify(payloadDePrueba())
     );
-    expect(resultado).toEqual({ enviados: 1, encontrados: 2, pendientes: 0, completo: true });
+    expect(resultado).toEqual({ enviados: 1, encontrados: 2, pendientes: 0, completo: true, enviadosDnis: ["20999888"] });
   });
 
   it("no hace nada cuando no hay suscripciones", async () => {
@@ -119,7 +119,7 @@ describe("enviarPushAClientes", () => {
 
     expect(getCustomerSummaryService).not.toHaveBeenCalled();
     expect(armarPayload).not.toHaveBeenCalled();
-    expect(resultado).toEqual({ enviados: 0, encontrados: 0, pendientes: 0, completo: true });
+    expect(resultado).toEqual({ enviados: 0, encontrados: 0, pendientes: 0, completo: true, enviadosDnis: [] });
   });
 
   it("respeta el deadline y devuelve las suscripciones pendientes", async () => {
@@ -142,5 +142,27 @@ describe("enviarPushAClientes", () => {
     expect(resultado.enviados).toBe(1);
     expect(resultado.pendientes).toBe(2);
     expect(sendNotification).toHaveBeenCalledTimes(1);
+  });
+
+  it("saltea los DNI ya notificados y devuelve solo los nuevos enviados", async () => {
+    suscripciones("20111222", "20999888");
+    resumenes({
+      "20111222": { data: { customer: { status: "active", debt: "1000" } } },
+      "20999888": { data: { customer: { status: "active", debt: "1000" } } },
+    });
+
+    const armarPayload = vi.fn().mockReturnValue(payloadDePrueba());
+    const resultado = await enviarPushAClientes({
+      armarPayload,
+      exceptoDnis: ["20111222"],
+    });
+
+    expect(sendNotification).toHaveBeenCalledTimes(1);
+    expect(sendNotification).toHaveBeenCalledWith(
+      { endpoint: "https://push/20999888" },
+      JSON.stringify(payloadDePrueba())
+    );
+    expect(resultado.enviadosDnis).toEqual(["20999888"]);
+    expect(resultado.completo).toBe(true);
   });
 });

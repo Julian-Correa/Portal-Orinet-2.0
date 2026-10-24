@@ -243,13 +243,26 @@ export default function AdminDashboard({ session }) {
     setError("");
     try {
       const texto = draftAvisos[dia] || { title: "", body: "" };
-      const res = await adminApi.triggerPush(adminCode, {
-        dia,
-        title: texto.title || "",
-        body: texto.body || "",
-      });
-      setTriggerResult({ dia, ...res });
-      setTimeout(() => setTriggerResult(null), 8000);
+      let res;
+      let lotes = 0;
+
+      // Cada lote corre dentro del limite de 10s de la function de Netlify.
+      // Si quedan suscriptos sin procesar, se vuelve a llamar al trigger:
+      // el servidor reanuda desde el registro del mes, asi que no duplica.
+      while (true) {
+        res = await adminApi.triggerPush(adminCode, {
+          dia,
+          title: texto.title || "",
+          body: texto.body || "",
+        });
+        setTriggerResult({ dia, ...res });
+
+        if (res.completo || res.pendientes === 0 || lotes >= 100) break;
+        lotes++;
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+
+      setTimeout(() => setTriggerResult(null), 15000);
     } catch (err) {
       setError(`Error al ejecutar el aviso: ${err.message}`);
       console.error(err);
@@ -639,8 +652,8 @@ export default function AdminDashboard({ session }) {
         {triggerResult && (
           triggerResult.completo === false ? (
             <div className="text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border bg-amber-500/10 border-amber-500/30 text-amber-400">
-              Se enviaron {triggerResult.enviados} de {triggerResult.encontrados} avisos antes del tiempo limite del servidor.
-              Quedaron {triggerResult.pendientes} sin procesar, vuelve a ejecutar el aviso para completar el envio.
+              Enviando… lote actual: {triggerResult.enviados} avisos.
+              Notificados este mes: {triggerResult.yaEnviados} de {triggerResult.encontrados} suscriptos.
             </div>
           ) : (
             <div className={`text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border ${
@@ -650,7 +663,7 @@ export default function AdminDashboard({ session }) {
             }`}>
               {triggerResult.encontrados === 0
                 ? "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
-                : `Aviso ${triggerResult.dia}/x enviado a ${triggerResult.enviados} de ${triggerResult.encontrados} cliente${triggerResult.encontrados === 1 ? "" : "s"} suscripto${triggerResult.encontrados === 1 ? "" : "s"}.`}
+                : `Aviso ${triggerResult.dia}/x completado. En el ultimo lote se enviaron ${triggerResult.enviados} avisos. Notificados este mes: ${triggerResult.yaEnviados} de ${triggerResult.encontrados} suscriptos.`}
             </div>
           )
         )}

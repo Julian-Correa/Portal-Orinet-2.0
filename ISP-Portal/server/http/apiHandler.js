@@ -2,6 +2,7 @@ import { getCustomerSummaryService, getHealthStatus, getCache } from "../app/run
 import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
 import { configRepository } from "../repositories/configRepository.js";
+import { pushRunsRepository } from "../repositories/pushRunsRepository.js";
 import { metricsRepository } from "../repositories/metricsRepository.js";
 import { enviarPushAClientes, enParaleloLimitado } from "../lib/pushNotifications.js";
 import { DIAS_AVISO, armarPayloadAviso, textosPorDefecto } from "../lib/notificaciones.js";
@@ -194,6 +195,7 @@ export function createApiHandler({
   getHealthStatus: getHealth = getHealthStatus,
   configRepo = configRepository,
   enviarPush = enviarPushAClientes,
+  pushRunsRepo = pushRunsRepository,
 } = {}) {
   return async function handleRequest(event = {}) {
     const startedAt = Date.now();
@@ -426,13 +428,20 @@ export function createApiHandler({
           body: body.body === undefined ? textoGuardado.body : body.body,
         };
 
-        const { enviados, encontrados, pendientes, completo } = await enviarPush({
+        const run = await pushRunsRepo.getRun(dia);
+
+        const { enviados, encontrados, pendientes, completo, enviadosDnis } = await enviarPush({
           armarPayload: (customer) => armarPayloadAviso({ dia, customer, texto }),
           concurrencia: 5,
           deadlineMs: env.pushDeadlineMs,
+          exceptoDnis: run.enviados,
         });
 
-        return json(200, { ok: true, dia, enviados, encontrados, pendientes, completo }, headers);
+        await pushRunsRepo.registrarEnviados(dia, enviadosDnis);
+
+        const yaEnviados = run.enviados.length + enviadosDnis.length;
+
+        return json(200, { ok: true, dia, enviados, encontrados, pendientes, completo, yaEnviados }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {

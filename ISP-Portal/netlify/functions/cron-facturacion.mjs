@@ -2,6 +2,7 @@ import "dotenv/config";
 import { enviarPushAClientes } from "../../server/lib/pushNotifications.js";
 import { armarPayloadAviso } from "../../server/lib/notificaciones.js";
 import { configRepository } from "../../server/repositories/configRepository.js";
+import { pushRunsRepository } from "../../server/repositories/pushRunsRepository.js";
 
 export default async function handler() {
   try {
@@ -12,10 +13,14 @@ export default async function handler() {
     }
 
     const avisos = await configRepository.getAvisosPush();
+    const run = await pushRunsRepository.getRun(1);
 
-    const { enviados, encontrados } = await enviarPushAClientes({
+    const { enviados, encontrados, enviadosDnis } = await enviarPushAClientes({
       armarPayload: (customer) => armarPayloadAviso({ dia: 1, customer, texto: avisos[1] }),
+      exceptoDnis: run.enviados,
     });
+
+    await pushRunsRepository.registrarEnviados(1, enviadosDnis);
 
     if (encontrados === 0) {
       return new Response("No subscriptions found", { status: 200 });
