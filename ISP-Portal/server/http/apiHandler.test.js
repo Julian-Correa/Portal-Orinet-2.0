@@ -86,6 +86,7 @@ describe("apiHandler - avisos push", () => {
         pendientes,
         completo: pendientes === 0,
         enviadosDnis: payload ? ["20111222"] : [],
+        omitidos: { filtro: payload ? 1 : 2, deshabilitado: 0, sinResumen: 0, error: 0 },
       };
     });
 
@@ -122,6 +123,7 @@ describe("apiHandler - avisos push", () => {
       pendientes: 1,
       completo: false,
       yaEnviados: 1,
+      omitidos: { filtro: 1, deshabilitado: 0, sinResumen: 0, error: 0 },
     });
 
     // Reanuda desde el registro del mes y persiste los nuevos enviados

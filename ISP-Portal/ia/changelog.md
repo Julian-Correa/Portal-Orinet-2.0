@@ -1,5 +1,14 @@
 ## 2026-10-24
 
+### Desglose de omitidos en avisos push: el cartel explica por que un suscripto no recibe el aviso
+
+- **Contexto:** ejecutar el aviso 24/x informaba "17 de 61 suscriptos notificados" sin aclarar que los demas fueron filtrados por regla de negocio (dias 9 y 24 exigen deuda; ademas solo van a servicios habilitados). El cartel sonaba a error.
+- **Contadores por motivo (`pushNotifications.js`):** `enviarPushAClientes` ahora acumula `omitidos: { filtro, deshabilitado, sinResumen, error }` — sin deuda vigente para el aviso / servicio suspendido o bloqueado / sin datos del cliente en ISPCube / error al notificar.
+- **Trigger (`apiHandler.js`):** la respuesta incluye `omitidos`.
+- **UI (`AdminDashboard.jsx`):** el cartel final muestra el desglose en una linea chica bajo el total ("Los demas no reciben este aviso: X sin deuda vigente, Y con servicio suspendido o bloqueado…"). Se elimino la frase "En el ultimo lote se enviaron N avisos" que confundia cuando el ultimo lote solo filtraba.
+- **Recordatorio de regla:** aviso 1/x va a todos los habilitados; avisos 9/x y 24/x solo a habilitados con deuda (`requiereDeuda` en `AVISOS`).
+- **Tests:** 64/64, aserciones actualizadas al shape con `omitidos`.
+
 ### Cola de avisos push: sin duplicados y auto-completado hasta agotar suscriptos
 
 - **Problema:** cada ejecucion del trigger reenviaba a todos los suscriptos sin memoria de a quien ya se le habia enviado, y con 61 suscriptos el lote no alcanzaba a completarse dentro de la ventana de 10s de Netlify.

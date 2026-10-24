@@ -430,7 +430,7 @@ export function createApiHandler({
 
         const run = await pushRunsRepo.getRun(dia);
 
-        const { enviados, encontrados, pendientes, completo, enviadosDnis } = await enviarPush({
+        const { enviados, encontrados, pendientes, completo, enviadosDnis, omitidos } = await enviarPush({
           armarPayload: (customer) => armarPayloadAviso({ dia, customer, texto }),
           concurrencia: 5,
           deadlineMs: env.pushDeadlineMs,
@@ -441,7 +441,7 @@ export function createApiHandler({
 
         const yaEnviados = run.enviados.length + enviadosDnis.length;
 
-        return json(200, { ok: true, dia, enviados, encontrados, pendientes, completo, yaEnviados }, headers);
+        return json(200, { ok: true, dia, enviados, encontrados, pendientes, completo, yaEnviados, omitidos }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {

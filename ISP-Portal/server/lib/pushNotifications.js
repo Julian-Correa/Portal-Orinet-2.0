@@ -39,7 +39,14 @@ export async function enviarPushAClientes({
   const subscriptions = await cache.getAllSubscriptions();
 
   if (subscriptions.length === 0) {
-    return { enviados: 0, encontrados: 0, pendientes: 0, completo: true, enviadosDnis: [] };
+    return {
+      enviados: 0,
+      encontrados: 0,
+      pendientes: 0,
+      completo: true,
+      enviadosDnis: [],
+      omitidos: { filtro: 0, deshabilitado: 0, sinResumen: 0, error: 0 },
+    };
   }
 
   const customerSummaryService = await getCustomerSummaryService();
@@ -50,6 +57,7 @@ export async function enviarPushAClientes({
   let procesadas = 0;
   let cortado = false;
   const enviadosDnis = [];
+  const omitidos = { filtro: 0, deshabilitado: 0, sinResumen: 0, error: 0 };
 
   await enParaleloLimitado(subscriptions, concurrencia, async (sub) => {
     if (deadlineMs > 0 && Date.now() - inicio >= deadlineMs) {
@@ -66,17 +74,20 @@ export async function enviarPushAClientes({
       const summary = await customerSummaryService.getSummaryByDni(dni);
 
       if (!summary || summary.error) {
+        omitidos.sinResumen++;
         return; // No se pudo verificar el estado del cliente
       }
 
       const customer = summary.data.customer;
 
       if (!isServiceEnabled(customer.status)) {
+        omitidos.deshabilitado++;
         return; // Solo clientes habilitados
       }
 
       const payload = armarPayload(customer);
       if (!payload) {
+        omitidos.filtro++;
         return;
       }
 
@@ -84,6 +95,7 @@ export async function enviarPushAClientes({
       enviados++;
       enviadosDnis.push(dni);
     } catch (err) {
+      omitidos.error++;
       console.error(`Error enviando push a dni ${dni}:`, err);
     } finally {
       procesadas++;
@@ -98,5 +110,6 @@ export async function enviarPushAClientes({
     pendientes,
     completo: !cortado && pendientes === 0,
     enviadosDnis,
+    omitidos,
   };
 }

@@ -661,9 +661,28 @@ export default function AdminDashboard({ session }) {
                 ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
                 : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
             }`}>
-              {triggerResult.encontrados === 0
-                ? "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
-                : `Aviso ${triggerResult.dia}/x completado. En el ultimo lote se enviaron ${triggerResult.enviados} avisos. Notificados este mes: ${triggerResult.yaEnviados} de ${triggerResult.encontrados} suscriptos.`}
+              {triggerResult.encontrados === 0 ? (
+                "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
+              ) : (
+                <>
+                  Aviso {triggerResult.dia}/x completado. Notificados este mes: {triggerResult.yaEnviados} de {triggerResult.encontrados} suscriptos.
+                  {(() => {
+                    const o = triggerResult.omitidos || {};
+                    const total = (o.filtro || 0) + (o.deshabilitado || 0) + (o.sinResumen || 0) + (o.error || 0);
+                    if (total === 0) return null;
+                    const detalles = [];
+                    if (o.filtro) detalles.push(`${o.filtro} sin deuda vigente`);
+                    if (o.deshabilitado) detalles.push(`${o.deshabilitado} con servicio suspendido o bloqueado`);
+                    if (o.sinResumen) detalles.push(`${o.sinResumen} sin datos del cliente`);
+                    if (o.error) detalles.push(`${o.error} con error al notificar`);
+                    return (
+                      <span className="block text-xs font-normal text-emerald-500/80 mt-1">
+                        Los demas no reciben este aviso: {detalles.join(", ")}.
+                      </span>
+                    );
+                  })()}
+                </>
+              )}
             </div>
           )
         )}
