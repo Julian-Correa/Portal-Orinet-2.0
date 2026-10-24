@@ -74,7 +74,9 @@ describe("apiHandler - avisos push", () => {
     };
     const enviarPush = vi.fn(async ({ armarPayload }) => {
       const payload = armarPayload({ status: "active", debt: "500" });
-      return { enviados: payload ? 1 : 0, encontrados: 2 };
+      const enviados = payload ? 1 : 0;
+      const pendientes = 2 - enviados;
+      return { enviados, encontrados: 2, pendientes, completo: pendientes === 0 };
     });
 
     const handler = createApiHandler({
@@ -101,7 +103,7 @@ describe("apiHandler - avisos push", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body)).toEqual({ ok: true, dia: 9, enviados: 1, encontrados: 2 });
+    expect(JSON.parse(response.body)).toEqual({ ok: true, dia: 9, enviados: 1, encontrados: 2, pendientes: 1, completo: false });
 
     const { armarPayload } = enviarPush.mock.calls[0][0];
     expect(armarPayload({ debt: "100" })).toEqual({

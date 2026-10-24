@@ -1,5 +1,14 @@
 ## 2026-10-24
 
+### Fix: 504 en ejecucion manual de avisos y broadcast push
+
+- **Problema:** `POST /admin/push/trigger` y `POST /admin/push/broadcast` corren dentro de la function `api` de Netlify (limite 10s). Procesaban las suscripciones secuencialmente y por cada una consultaban ISPCube (5-6 llamadas HTTP cuando no hay cache), por lo que el gateway cortaba la request con **504 Gateway Timeout** antes de terminar.
+- **Envio en paralelo (`server/lib/pushNotifications.js`):** nuevo helper exportado `enParaleloLimitado(items, limite, tarea)` que ejecuta `tarea` con concurrencia acotada. `enviarPushAClientes` ahora acepta `concurrencia` (default 5) y `deadlineMs` (default 0 = sin limite). Al agotarse el presupuesto deja de reclamar suscripciones nuevas y devuelve `{ enviados, encontrados, pendientes, completo }` en vez de morir con timeout.
+- **Presupuesto de tiempo (`server/config/env.js`, `server/http/apiHandler.js`):** nueva variable `PUSH_DEADLINE_MS` (default 7000ms, margen bajo el limite de 10s de Netlify). El trigger pasa `deadlineMs` a `enviarPushAClientes`; el broadcast ahora tambien es paralelo (8 workers) con el mismo presupuesto y responde `pending`/`completo`.
+- **UI parcial (`AdminDashboard.jsx`):** si el resultado llega incompleto (`completo === false`), trigger y broadcast muestran un aviso ambar con enviados/pendientes indicando que re-ejecutar completa el envio (el resumen de clientes queda cacheado, asi que la re-ejecucion es mas rapida).
+- **Crons sin cambios:** no pasan `deadlineMs` (siguen sin limite; Netlify les da 15 min).
+- **Tests:** 62/62. Nuevos casos: deadline con pendientes en `pushNotifications.test.js`; aserciones de trigger/mock actualizadas al nuevo shape.
+
 ### Fix: errores del modulo de notificaciones push
 
 - **Fix CORS (`server/http/apiHandler.js`):** el header `Access-Control-Allow-Methods` solo declaraba `GET, PUT, OPTIONS`. Los endpoints de push (`/admin/push/trigger`, `/admin/push/broadcast`, `/push/subscribe`) usan `POST`, por lo que el browser los bloqueaba en el preflight antes de llegar al servidor. Se agrego `POST` a la lista.

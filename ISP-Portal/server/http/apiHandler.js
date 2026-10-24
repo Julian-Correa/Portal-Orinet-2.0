@@ -3,7 +3,7 @@ import { env, validateIspConfig } from "../config/env.js";
 import { IspHttpError } from "../repositories/ispRepository.js";
 import { configRepository } from "../repositories/configRepository.js";
 import { metricsRepository } from "../repositories/metricsRepository.js";
-import { enviarPushAClientes } from "../lib/pushNotifications.js";
+import { enviarPushAClientes, enParaleloLimitado } from "../lib/pushNotifications.js";
 import { DIAS_AVISO, armarPayloadAviso, textosPorDefecto } from "../lib/notificaciones.js";
 import webpush from "web-push";
 
@@ -337,30 +337,39 @@ export function createApiHandler({
 
         const cache = await getCache();
         const subscriptions = await cache.getAllSubscriptions();
-        
+
         let sentCount = 0;
         let failedCount = 0;
+        let processed = 0;
+        const startedAt = Date.now();
         const payload = JSON.stringify({
           title: title || "OriNet",
           body: message,
           url: "/"
         });
 
-        for (const sub of subscriptions) {
+        await enParaleloLimitado(subscriptions, 8, async (sub) => {
+          if (Date.now() - startedAt >= env.pushDeadlineMs) return;
           try {
             await webpush.sendNotification(sub.subscription, payload);
             sentCount++;
           } catch (err) {
             failedCount++;
             console.error(`Error enviando broadcast push a dni ${sub.dni}:`, err.message);
+          } finally {
+            processed++;
           }
-        }
+        });
+
+        const pending = subscriptions.length - processed;
 
         return json(200, {
           ok: true,
           subscribers: subscriptions.length,
           sent: sentCount,
           failed: failedCount,
+          pending,
+          completo: pending === 0,
         }, headers);
       }
 
@@ -417,11 +426,13 @@ export function createApiHandler({
           body: body.body === undefined ? textoGuardado.body : body.body,
         };
 
-        const { enviados, encontrados } = await enviarPush({
+        const { enviados, encontrados, pendientes, completo } = await enviarPush({
           armarPayload: (customer) => armarPayloadAviso({ dia, customer, texto }),
+          concurrencia: 5,
+          deadlineMs: env.pushDeadlineMs,
         });
 
-        return json(200, { ok: true, dia, enviados, encontrados }, headers);
+        return json(200, { ok: true, dia, enviados, encontrados, pendientes, completo }, headers);
       }
       
       if (routePath === "/metrics/comprobante-clicks" && method === "POST") {

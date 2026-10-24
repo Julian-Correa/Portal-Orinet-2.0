@@ -51,7 +51,7 @@ describe("enviarPushAClientes", () => {
       { endpoint: "https://push/20111222" },
       JSON.stringify(payloadDePrueba())
     );
-    expect(resultado).toEqual({ enviados: 1, encontrados: 1 });
+    expect(resultado).toEqual({ enviados: 1, encontrados: 1, pendientes: 0, completo: true });
   });
 
   it.each(["blocked", "suspendido", "disabled", "no_service"])(
@@ -65,7 +65,7 @@ describe("enviarPushAClientes", () => {
 
       expect(armarPayload).not.toHaveBeenCalled();
       expect(sendNotification).not.toHaveBeenCalled();
-      expect(resultado).toEqual({ enviados: 0, encontrados: 1 });
+      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
     }
   );
 
@@ -73,12 +73,12 @@ describe("enviarPushAClientes", () => {
     suscripciones("20111222");
     resumenes({ "20111222": { data: { customer: { status: "active", debt: "0" } } } });
 
-    const armarPayload = vi.fn().mockReturnValue(null);
-    const resultado = await enviarPushAClientes({ armarPayload });
+      const armarPayload = vi.fn().mockReturnValue(null);
+      const resultado = await enviarPushAClientes({ armarPayload });
 
-    expect(sendNotification).not.toHaveBeenCalled();
-    expect(resultado).toEqual({ enviados: 0, encontrados: 1 });
-  });
+      expect(sendNotification).not.toHaveBeenCalled();
+      expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
+    });
 
   it("saltea suscripciones sin resumen valido", async () => {
     suscripciones("20111222");
@@ -88,7 +88,7 @@ describe("enviarPushAClientes", () => {
     const resultado = await enviarPushAClientes({ armarPayload });
 
     expect(sendNotification).not.toHaveBeenCalled();
-    expect(resultado).toEqual({ enviados: 0, encontrados: 1 });
+    expect(resultado).toEqual({ enviados: 0, encontrados: 1, pendientes: 0, completo: true });
   });
 
   it("un fallo en una suscripcion no corta el resto del envio", async () => {
@@ -108,7 +108,7 @@ describe("enviarPushAClientes", () => {
       { endpoint: "https://push/20999888" },
       JSON.stringify(payloadDePrueba())
     );
-    expect(resultado).toEqual({ enviados: 1, encontrados: 2 });
+    expect(resultado).toEqual({ enviados: 1, encontrados: 2, pendientes: 0, completo: true });
   });
 
   it("no hace nada cuando no hay suscripciones", async () => {
@@ -119,6 +119,28 @@ describe("enviarPushAClientes", () => {
 
     expect(getCustomerSummaryService).not.toHaveBeenCalled();
     expect(armarPayload).not.toHaveBeenCalled();
-    expect(resultado).toEqual({ enviados: 0, encontrados: 0 });
+    expect(resultado).toEqual({ enviados: 0, encontrados: 0, pendientes: 0, completo: true });
+  });
+
+  it("respeta el deadline y devuelve las suscripciones pendientes", async () => {
+    suscripciones("20111111", "20222222", "20333333");
+    getCustomerSummaryService.mockResolvedValue({
+      getSummaryByDni: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 30));
+        return { data: { customer: { status: "active", debt: "1000" } } };
+      },
+    });
+
+    const armarPayload = vi.fn().mockReturnValue(payloadDePrueba());
+    const resultado = await enviarPushAClientes({
+      armarPayload,
+      concurrencia: 1,
+      deadlineMs: 10,
+    });
+
+    expect(resultado.completo).toBe(false);
+    expect(resultado.enviados).toBe(1);
+    expect(resultado.pendientes).toBe(2);
+    expect(sendNotification).toHaveBeenCalledTimes(1);
   });
 });

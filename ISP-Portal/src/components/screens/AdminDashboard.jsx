@@ -573,6 +573,11 @@ export default function AdminDashboard({ session }) {
             <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
               No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular.
             </div>
+          ) : broadcastResult.completo === false ? (
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
+              Se enviaron {broadcastResult.sent} de {broadcastResult.subscribers} avisos antes del tiempo limite del servidor.
+              Quedaron {broadcastResult.pending} sin procesar, vuelve a intentarlo para completar el envio.
+            </div>
           ) : (
             <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium px-4 py-3 rounded-xl mt-4 animate-in fade-in">
               Aviso enviado a {broadcastResult.sent} de {broadcastResult.subscribers} cliente{broadcastResult.subscribers === 1 ? "" : "s"} suscripto{broadcastResult.subscribers === 1 ? "" : "s"}.
@@ -632,15 +637,22 @@ export default function AdminDashboard({ session }) {
         </div>
 
         {triggerResult && (
-          <div className={`text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border ${
-            triggerResult.encontrados === 0
-              ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-              : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-          }`}>
-            {triggerResult.encontrados === 0
-              ? "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
-              : `Aviso ${triggerResult.dia}/x enviado a ${triggerResult.enviados} de ${triggerResult.encontrados} cliente${triggerResult.encontrados === 1 ? "" : "s"} suscripto${triggerResult.encontrados === 1 ? "" : "s"}.`}
-          </div>
+          triggerResult.completo === false ? (
+            <div className="text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border bg-amber-500/10 border-amber-500/30 text-amber-400">
+              Se enviaron {triggerResult.enviados} de {triggerResult.encontrados} avisos antes del tiempo limite del servidor.
+              Quedaron {triggerResult.pendientes} sin procesar, vuelve a ejecutar el aviso para completar el envio.
+            </div>
+          ) : (
+            <div className={`text-sm font-medium px-4 py-3 rounded-xl mb-4 animate-in fade-in border ${
+              triggerResult.encontrados === 0
+                ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+            }`}>
+              {triggerResult.encontrados === 0
+                ? "No hay clientes suscriptos a notificaciones todavia. Deben activarlas desde el portal en su celular."
+                : `Aviso ${triggerResult.dia}/x enviado a ${triggerResult.enviados} de ${triggerResult.encontrados} cliente${triggerResult.encontrados === 1 ? "" : "s"} suscripto${triggerResult.encontrados === 1 ? "" : "s"}.`}
+            </div>
+          )
         )}
 
         <div className="space-y-4">
