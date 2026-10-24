@@ -1,3 +1,12 @@
+## 2026-10-24
+
+### Fix: errores del modulo de notificaciones push
+
+- **Fix CORS (`server/http/apiHandler.js`):** el header `Access-Control-Allow-Methods` solo declaraba `GET, PUT, OPTIONS`. Los endpoints de push (`/admin/push/trigger`, `/admin/push/broadcast`, `/push/subscribe`) usan `POST`, por lo que el browser los bloqueaba en el preflight antes de llegar al servidor. Se agrego `POST` a la lista.
+- **Fix imports de tests de cron (`tests/cron-notificaciones.test.js`, `tests/cron-facturacion.test.js`):** los tests importaban los handlers con extension `.js` pero los archivos reales en `netlify/functions/` son `.mjs`. Esto causaba `ERR_MODULE_NOT_FOUND` y los 11 tests de cron fallaban completamente.
+- **Mejora de errores en AdminDashboard (`src/components/screens/AdminDashboard.jsx`):** todos los `catch` de los handlers ahora propagan `err.message` al estado de error en lugar de un texto estatico generico. El modal de error separa visualmente el contexto (texto blanco, que operacion fallo) del detalle tecnico (fuente monoespaciada sobre fondo oscuro, mensaje real del servidor o del runtime). El catch inline del popup config que usaba `catch {}` sin variable paso a `catch (err)` para poder exponer el mensaje.
+- **Estado de tests:** 61/61 pasando (10 suites).
+
 ## 2026-10-07
 
 ### Stat card de notificaciones activas en el panel admin

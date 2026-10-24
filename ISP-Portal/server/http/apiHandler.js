@@ -37,7 +37,7 @@ function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": env.corsOrigin,
     "Access-Control-Allow-Headers": "Content-Type, Accept, x-admin-code",
-    "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
     "Content-Type": "application/json",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
     "Referrer-Policy": "no-referrer",

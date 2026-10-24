@@ -99,9 +99,9 @@ export default function AdminDashboard({ session }) {
         setAvisosDefaults(avisosData?.defaults || {});
         setDraftAvisos(avisosData?.avisos || {});
         setPushSubscribersCount(pushCountData?.count ?? 0);
-      } catch (err) {
-        setError("Error al cargar los datos del panel.");
-        console.error(err);
+    } catch (err) {
+      setError(`Error al cargar los datos del panel: ${err.message}`);
+      console.error(err);
       } finally {
         setLoading(false);
       }
@@ -133,7 +133,7 @@ export default function AdminDashboard({ session }) {
       setLastSavedCosto(key);
       setTimeout(() => setLastSavedCosto(null), 3000);
     } catch (err) {
-      setError("Error al guardar la configuración.");
+      setError(`Error al guardar la configuración: ${err.message}`);
       console.error(err);
     } finally {
       setSavingCostos(false);
@@ -149,7 +149,7 @@ export default function AdminDashboard({ session }) {
       setLastSavedPopup(true);
       setTimeout(() => setLastSavedPopup(false), 3000);
     } catch (err) {
-      setError("Error al actualizar el estado del popup.");
+      setError(`Error al actualizar el estado del popup: ${err.message}`);
       console.error(err);
       setPopup(popup); // revert
     } finally {
@@ -178,7 +178,7 @@ export default function AdminDashboard({ session }) {
       setLastSavedPlanId(tempPlan.id);
       setTimeout(() => setLastSavedPlanId(null), 3000);
     } catch (err) {
-      setError("Error al guardar el plan.");
+      setError(`Error al guardar el plan: ${err.message}`);
       console.error(err);
     } finally {
       setSavingPlanes(false);
@@ -203,7 +203,7 @@ export default function AdminDashboard({ session }) {
       setBroadcastMessage("");
       setTimeout(() => setBroadcastResult(null), 6000);
     } catch (err) {
-      setError("Error al enviar el aviso general.");
+      setError(`Error al enviar el aviso general: ${err.message}`);
       console.error(err);
     } finally {
       setSendingBroadcast(false);
@@ -230,7 +230,7 @@ export default function AdminDashboard({ session }) {
       setSavedAvisoDia(dia);
       setTimeout(() => setSavedAvisoDia(null), 3000);
     } catch (err) {
-      setError("Error al guardar el texto del aviso.");
+      setError(`Error al guardar el texto del aviso: ${err.message}`);
       console.error(err);
     } finally {
       setSavingAvisoDia(null);
@@ -251,7 +251,7 @@ export default function AdminDashboard({ session }) {
       setTriggerResult({ dia, ...res });
       setTimeout(() => setTriggerResult(null), 8000);
     } catch (err) {
-      setError("Error al ejecutar el aviso.");
+      setError(`Error al ejecutar el aviso: ${err.message}`);
       console.error(err);
     } finally {
       setRunningAvisoDia(null);
@@ -297,7 +297,20 @@ export default function AdminDashboard({ session }) {
               </svg>
               <h3 className="text-lg font-bold">Ocurrió un error</h3>
             </div>
-            <p className="text-slate-300 text-sm mb-6">{error}</p>
+            {(() => {
+              const colonIdx = error.indexOf(": ");
+              if (colonIdx !== -1) {
+                const context = error.slice(0, colonIdx);
+                const detail = error.slice(colonIdx + 2);
+                return (
+                  <>
+                    <p className="text-slate-200 text-sm font-medium mb-2">{context}</p>
+                    <p className="text-slate-400 text-xs font-mono bg-[#080D1C] border border-white/10 rounded-lg px-3 py-2 mb-6 break-all">{detail}</p>
+                  </>
+                );
+              }
+              return <p className="text-slate-300 text-sm mb-6">{error}</p>;
+            })()}
             <button 
               onClick={() => setError("")}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg transition-colors"
@@ -523,8 +536,8 @@ export default function AdminDashboard({ session }) {
                       setLastSavedPopup(true);
                       setTimeout(() => setLastSavedPopup(false), 3000);
                       setShowPopupConfig(false);
-                    } catch {
-                      setError("Error al guardar detalles de popup.");
+                    } catch (err) {
+                      setError(`Error al guardar detalles de popup: ${err.message}`);
                     } finally {
                       setSavingPopup(false);
                     }

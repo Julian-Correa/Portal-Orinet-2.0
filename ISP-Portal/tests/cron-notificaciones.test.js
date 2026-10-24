@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import handler, { config } from "../netlify/functions/cron-notificaciones.js";
+import handler, { config } from "../netlify/functions/cron-notificaciones.mjs";
 
 const { enviarPushAClientes, getAvisosPush } = vi.hoisted(() => ({
   enviarPushAClientes: vi.fn(),

@@ -9,7 +9,7 @@ El frontend esta parcialmente modularizado. `src/App.jsx` sigue siendo el archiv
 - `Navbar`: Barra de navegación con logo y enlaces contextuales (cliente o admin).
 - `PopupImage`: popup opcional de comunicacion visual.
 - `LoginScreen`: ingreso por DNI y primer fetch al backend.
-- `AdminDashboard`: Panel administrativo con configuración de costos, métricas, planes, aviso general, avisos push programados (texto editable + ejecución manual de los días 1/x, 9/x y 24/x) y card de notificaciones activas (usuarios suscriptos a push en tiempo real).
+- `AdminDashboard`: Panel administrativo con configuración de costos, métricas, planes, aviso general, avisos push programados (texto editable + ejecución manual de los días 1/x, 9/x y 24/x) y card de notificaciones activas (usuarios suscriptos a push en tiempo real). El modal de error muestra el contexto de la operacion que fallo separado del detalle tecnico del servidor (mensaje en fuente monoespaciada sobre fondo oscuro). Todos los handlers propagan `err.message` al estado de error.
 - `ProfileScreen`: dashboard principal del cliente.
 - `PlanesScreen`, `ServiciosScreen`, `FacturacionScreen`, `NosotrosScreen`: Vistas secundarias modulares.
 - `EmailCard`: alta/edicion del email de facturacion.
